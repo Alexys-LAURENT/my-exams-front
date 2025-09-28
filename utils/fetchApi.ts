@@ -39,9 +39,9 @@ export const fetchApi = async (url: string, options?: RequestInit, allowEmptyTok
 			return data;
 		}
 		throw new Error(data.message);
-	} catch (error: any) {
+	} catch (error: unknown) {
 		console.error(`fetchApi::error : ${url}`);
-		console.error(error.message ? error.message : error);
+		console.error(error instanceof Error ? error.message : error);
 		throw new Error('Une erreur est survenue');
 	}
 };
