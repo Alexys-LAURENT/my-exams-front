@@ -6,10 +6,7 @@ export default auth((req) => {
 	const loggedUser = req.auth
 	const currentPath = req.nextUrl.pathname;
 
-	const response = NextResponse.next();
-
-	console.log("loggedUser",loggedUser);
-	
+	const response = NextResponse.next();	
 
 	// Protect all routes except unprotected ones
 	if (!loggedUser && !regexUnprotectedRoutes.test(currentPath)) {

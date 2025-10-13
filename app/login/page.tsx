@@ -1,6 +1,7 @@
 'use client';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
-import { Button, Input } from '@heroui/react';
+import { Button } from '@heroui/button';
+import { Input } from '@heroui/input';
 import { signIn } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
@@ -70,12 +71,7 @@ const Page = () => {
 				</div>
 				{errorMessage && <p className="text-red-500">{errorMessage}</p>}
 				{successMessage && <p className="text-green-500">{successMessage}</p>}
-				<Button
-					isLoading={loading}
-					disabled={form.is_email_invalid === true || form.is_password_invalid === true || !form.email || !form.password}
-					className="w-full text-white disabled:opacity-50 disabled:hover:opacity-50 bg-bg_light_main_color/80"
-					type="submit"
-				>
+				<Button isLoading={loading} disabled={form.is_email_invalid === true || form.is_password_invalid === true || !form.email || !form.password} type="submit">
 					Se connecter
 				</Button>
 			</form>

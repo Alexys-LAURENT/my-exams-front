@@ -1,34 +1,33 @@
-
-import NextAuth, { DefaultSession } from "next-auth";
+import NextAuth, { DefaultSession } from 'next-auth';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { JWT } from "next-auth/jwt";
-import Credentials from "next-auth/providers/credentials";
-import { $api } from "./$api";
+import { JWT } from 'next-auth/jwt';
+import Credentials from 'next-auth/providers/credentials';
+import { $api } from './$api';
 
-declare module "next-auth" {
-  /**
-   * Returned by `auth`, `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
-   */
-  interface Session {
-    user: {
-      /** The user's ID */
+declare module 'next-auth' {
+	/**
+	 * Returned by `auth`, `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
+	 */
+	interface Session {
+		user: {
+			/** The user's ID */
 			id: string;
 			idUser: number;
 			lastName: string;
 			name: string;
 			email: string;
 			avatarPath: string;
-			accountType: "student" | "teacher" | "admin";
+			accountType: 'student' | 'teacher' | 'admin';
 			accessToken: string;
 			accessTokenExpiresAt: string;
-      /**
-       * By default, TypeScript merges new interface properties and overwrites existing ones.
-       * In this case, the default session user properties will be overwritten,
-       * with the new ones defined above. To keep the default session user properties,
-       * you need to add them back into the newly declared interface.
-       */
-    } & DefaultSession["user"]
-  }
+			/**
+			 * By default, TypeScript merges new interface properties and overwrites existing ones.
+			 * In this case, the default session user properties will be overwritten,
+			 * with the new ones defined above. To keep the default session user properties,
+			 * you need to add them back into the newly declared interface.
+			 */
+		} & DefaultSession['user'];
+	}
 
 	interface User {
 		id: string;
@@ -37,37 +36,35 @@ declare module "next-auth" {
 		name: string;
 		email: string;
 		avatarPath: string;
-		accountType: "student" | "teacher" | "admin";
+		accountType: 'student' | 'teacher' | 'admin';
 		accessToken: string;
 		accessTokenExpiresAt: string;
 	}
-	
 }
 
-declare module "next-auth/jwt" {
+declare module 'next-auth/jwt' {
 	interface JWT {
 		accessToken: string;
 		accessTokenExpiresAt: string;
 		idUser: number;
-		accountType: "student" | "teacher" | "admin";
+		accountType: 'student' | 'teacher' | 'admin';
 		lastName: string;
 		avatarPath: string;
 	}
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  providers: [
+	providers: [
 		Credentials({
-      credentials: {
-        email: { label: "Email" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
+			credentials: {
+				email: { label: 'Email' },
+				password: { label: 'Password', type: 'password' },
+			},
+			async authorize(credentials) {
+				if (!credentials?.email || !credentials?.password) {
 					throw new Error('Veuillez remplir tous les champs');
 				}
 
-					
 				const response = await fetch($api('api/auth/login'), {
 					method: 'POST',
 					headers: {
@@ -99,7 +96,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 				try {
 					const json = await response!.json();
 					console.log('Login response JSON', json);
-					
+
 					res = json;
 				} catch {
 					throw new Error(encodeURI('Nous rencontrons un problème technique, veuillez réessayer ultérieurement'));
@@ -122,17 +119,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 						accessTokenExpiresAt: res.data.accessToken.expiresAt,
 					};
 				}
-				
+
 				return null;
 			},
-    }),
+		}),
 	],
 	callbacks: {
 		async jwt({ token, user, trigger }) {
 			// First time login
 			if (user) {
-				console.log('JWT : FIRST TIME LOGIN', { user, token });
-				
 				token = {
 					...token,
 					accountType: user.accountType,
@@ -147,15 +142,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
 			// Session update
 			if (trigger === 'update') {
-				console.log('JWT : UPDATE TRIGGERED');
 				return token;
 			}
 			return token;
 		},
 		async session({ session, token }) {
 			if (token) {
-				console.log('SESSION CALLBACK', { session, token });
-				
 				session.user = {
 					...session.user,
 					idUser: token.idUser,
@@ -169,5 +161,4 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 			return session;
 		},
 	},
-})
-
+});

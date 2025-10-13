@@ -18,3 +18,15 @@ export type Meta = {
 	nextPageUrl: string | null;
 	previousPageUrl: string | null;
 };
+
+export type Class = {
+	idClass: number;
+	startDate: string;
+	endDate: string;
+	idDegree: number;
+};
+
+export type Degree = {
+	idDegree: number;
+	name: string;
+};
