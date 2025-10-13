@@ -33,6 +33,7 @@ const Page = () => {
 					autoComplete="email"
 					type="text"
 					onBlur={() => {
+						// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 						!form.email.includes('@') || !form.email.includes('.') ? setform((prev) => ({ ...prev, is_email_invalid: true })) : setform((prev) => ({ ...prev, is_email_invalid: false }));
 					}}
 					name="email"
@@ -52,6 +53,7 @@ const Page = () => {
 						value={form.password}
 						onChange={(e) => setform((prev) => ({ ...prev, password: e.target.value }))}
 						onBlur={() => {
+							// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 							!form.password.length || form.password.length < 8
 								? setform((prev) => ({ ...prev, is_password_invalid: true }))
 								: setform((prev) => ({ ...prev, is_password_invalid: false }));
