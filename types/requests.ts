@@ -24,6 +24,11 @@ export interface SuccessResponse<T> {
 	data: T;
 }
 
+export interface SuccessMessageResponse {
+	success: true;
+	message: string;
+}
+
 export interface PaginatedResponse<T> {
 	success: true;
 	data: {
