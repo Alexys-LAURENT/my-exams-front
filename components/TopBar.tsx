@@ -20,14 +20,18 @@ const TopBar = ({ loggedUser }: { loggedUser: Session }) => {
 	];
 
 	const teacherLinks = [
-		{ label: 'Create exam', href: '/exams/create' },
-		{ label: 'My exams', href: '/exams' },
-		{ label: 'All results', href: '/results/all' },
+		{ label: 'Dashboard', href: `/teacher/dashboard` },
+		{ label: 'Mes Examens', href: '/teacher/exams' },
+		{ label: 'Mes Classes', href: '/teacher/classes' },
+		{ label: 'Nouveau Examen', href: '/teacher/exam/create' },
 	];
 
 	const adminLinks = [
-		{ label: 'Users', href: '/admin/users' },
-		{ label: 'All results', href: '/results/all' },
+		{ label: 'Dashboard', href: `/admin/dashboard` },
+		{ label: 'Élèces', href: '/admin/students' },
+		{ label: 'Classes', href: '/admin/classes' },
+		{ label: 'Professeurs', href: '/admin/teachers' },
+		{ label: 'Promotions', href: '/admin/degrees' },
 	];
 
 	const selectedLinks = () => {
@@ -45,7 +49,7 @@ const TopBar = ({ loggedUser }: { loggedUser: Session }) => {
 	};
 
 	return (
-		<div className="w-full bg-white border-b border-b-black/10 flex items-center justify-between py-3 px-4">
+		<div className="flex items-center justify-between w-full px-4 py-3 bg-white border-b border-b-black/10">
 			<span className="font-semibold">
 				<Image src={Logo.src} alt="Logo" width={32} height={32} className="inline-block mr-2" />
 				My exams
@@ -60,7 +64,7 @@ const TopBar = ({ loggedUser }: { loggedUser: Session }) => {
 			<div>
 				<Popover>
 					<PopoverTrigger>
-						<div className="w-8 h-8 rounded-full bg-gray-400 cursor-pointer"></div>
+						<div className="w-8 h-8 bg-gray-400 rounded-full cursor-pointer"></div>
 					</PopoverTrigger>
 					<PopoverContent>
 						<div className="flex flex-col">
