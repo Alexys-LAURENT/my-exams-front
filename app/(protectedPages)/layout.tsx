@@ -4,9 +4,9 @@ import { auth } from '@/utils/auth';
 const Layout = async ({ children }: { children: React.ReactNode }) => {
 	const loggedUser = await auth();
 	return (
-		<div className="flex w-full flex-col min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+		<div className="flex flex-col items-center w-full min-h-screen bg-[#F0F4FF]">
 			<TopBar loggedUser={loggedUser!} />
-			{children}
+			<div className="flex flex-col  max-w-[1900px] w-full flex-1">{children}</div>
 		</div>
 	);
 };
