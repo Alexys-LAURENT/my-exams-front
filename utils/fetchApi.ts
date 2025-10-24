@@ -12,8 +12,6 @@ export const fetchApi = async (url: string, options?: RequestInit, allowEmptyTok
 
 		const token = session?.user.accessToken;
 
-		// console.log(`fetchApi::token : ${token}`);
-
 		if (!token && !allowEmptyToken) {
 			console.error(`Token not found : ${url}`);
 		}

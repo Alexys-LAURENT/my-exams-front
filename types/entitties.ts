@@ -97,7 +97,7 @@ export type UserResponseAnswer = {
 
 export type Evaluation = {
 	idEvaluation: number;
-	note: number | null;
+	note: string | null;
 	idStudent: number;
 	idTeacher: number;
 	idUserResponse: number;
@@ -125,6 +125,18 @@ export type QuestionWithDetails = Question & {
 };
 
 export type ExamRecap = Exam & {
-	quetions: QuestionWithDetails[];
+	questions: QuestionWithDetails[];
 	examGrade: ExamGrade;
+};
+
+export type QuestionWithAnswers = Question & {
+	answers: AnswerWithoutCorrect[];
+};
+
+export type QuestionWithAnswersAndUserReponse = QuestionWithAnswers & {
+	userResponse?: {
+		idUserResponse: number;
+		custom: string | null;
+		selectedAnswers: number[];
+	};
 };

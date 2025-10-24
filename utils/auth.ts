@@ -76,8 +76,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 					}),
 				});
 
-				console.log('Login response', response!.json);
-
 				let res: {
 					success?: boolean;
 					error?: boolean;
@@ -95,7 +93,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
 				try {
 					const json = await response!.json();
-					console.log('Login response JSON', json);
 
 					res = json;
 				} catch {
