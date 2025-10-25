@@ -28,10 +28,6 @@ const ExamTestQuestion = ({ currentQuestion, idExam, setQuestions, currentQuesti
 	const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
 	useEffect(() => {
-		console.log('Loading question:', currentQuestion);
-		console.log(currentQuestion.userResponse ? currentQuestion.userResponse.selectedAnswers : []);
-		console.log(currentQuestion.userResponse ? currentQuestion.userResponse.custom || '' : '');
-
 		setSelectedAnswers(currentQuestion.userResponse ? currentQuestion.userResponse.selectedAnswers : []);
 		setCustomAnswer(currentQuestion.userResponse ? currentQuestion.userResponse.custom || '' : '');
 

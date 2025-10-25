@@ -9,5 +9,5 @@ type StartExamResponse = Exam & {
 export const reTakeExam = async (idExam: number) => {
 	return (await fetchApi(`/api/exams/${idExam}/retake`, {
 		method: 'POST',
-	})) as ApiError | SuccessResponse<StartExamResponse>;
+	})) as ApiError | (SuccessResponse<StartExamResponse> & { forcedStop?: boolean });
 };

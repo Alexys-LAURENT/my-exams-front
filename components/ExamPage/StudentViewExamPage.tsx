@@ -2,7 +2,6 @@ import { getExamGradeOneStudent } from '@/backend_requests/exam_grades/getExamGr
 import { reTakeExam } from '@/backend_requests/exams/reTakeExam';
 import ExamRecapPage from './ExamRecapPage';
 import ExamTestPage from './ExamTestPage';
-
 interface StudentViewExamPageProps {
 	idExam: number;
 	idStudent: number;
@@ -19,8 +18,13 @@ const StudentViewExamPage = async ({ idStudent, idExam }: StudentViewExamPagePro
 	} else {
 		if (existingExamGrade.data.status === 'en cours') {
 			const reTakedExam = await reTakeExam(idExam);
+
 			if ('error' in reTakedExam) {
 				throw new Error('Error fetching exam data for retake');
+			}
+
+			if ('forcedStop' in reTakedExam && reTakedExam.forcedStop) {
+				return <ExamRecapPage idExam={idExam} idStudent={idStudent} isEditable={false} />;
 			}
 
 			const { questions, ...examWithoutQuestions } = reTakedExam.data;

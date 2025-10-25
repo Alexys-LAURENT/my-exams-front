@@ -21,8 +21,6 @@ const ExamTestPage = async ({ idExam, preLoadedExam, preLoadedQuestionsWithAnswe
 	let exam: Exam;
 	let totalQuestions: number;
 	if (preLoadedExam) {
-		console.log('Using preloaded exam data');
-
 		exam = preLoadedExam;
 		totalQuestions = preLoadedQuestionsWithAnswersAndUserResponse!.length;
 	} else {

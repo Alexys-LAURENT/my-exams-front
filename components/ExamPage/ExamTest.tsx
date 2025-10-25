@@ -36,7 +36,6 @@ const ExamTest = ({ exam, questionsCount, idUser, forceExamStarted, preLoadedQue
 
 	useEffect(() => {
 		if (!isExamStarted) return;
-		console.log('Connecting to exam socket...');
 
 		socket.emit('start_exam', { idExam: exam.idExam, idUser: idUser });
 

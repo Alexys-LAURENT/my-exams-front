@@ -11,7 +11,6 @@ interface ExamRecapPageProps {
 
 const ExamRecapPage = async ({ idStudent, idExam, isEditable }: ExamRecapPageProps) => {
 	const recapRes = await getExamRecap(idStudent, idExam);
-	console.log(isEditable);
 
 	if ('error' in recapRes) {
 		throw new Error('Error fetching exam recap data');
