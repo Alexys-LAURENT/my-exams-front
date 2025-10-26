@@ -21,7 +21,7 @@ export default auth((req) => {
 	// Redirect students to student dashboard if they try to access non-student routes but allow specific exam routes
 	if (loggedUser && loggedUser.user.accountType === 'student' && !currentPath.startsWith('/student')) {
 		if (!/^\/exams\/\d+\/students\/\d+$/.test(currentPath)) {
-			return NextResponse.redirect(new URL('/admin/dashboard', req.url));
+			return NextResponse.redirect(new URL('/student/classes', req.url));
 		}
 	}
 
@@ -33,7 +33,7 @@ export default auth((req) => {
 	// Allow teachers to access only teacher routes and specific student exam routes
 	if (loggedUser && loggedUser.user.accountType === 'teacher' && !currentPath.startsWith('/teacher')) {
 		if (!/^\/exams\/\d+\/students\/\d+$/.test(currentPath)) {
-			return NextResponse.redirect(new URL('/admin/dashboard', req.url));
+			return NextResponse.redirect(new URL('/teacher/dashboard', req.url));
 		}
 	}
 

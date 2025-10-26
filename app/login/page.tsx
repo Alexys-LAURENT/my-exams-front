@@ -11,12 +11,11 @@ const Page = () => {
 		email: '',
 		password: '',
 		is_email_invalid: false,
-		is_password_invalid: false,
-		remember_me: false,
 	});
 	const [loading, setLoading] = useState(false);
 	const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 	const callbackUrl = useSearchParams().get('callbackUrl') || '/';
+
 	const errorMessage = decodeURI(useSearchParams().get('error') || '');
 	const successMessage = decodeURI(useSearchParams().get('success') || '');
 	const handlesubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -64,15 +63,8 @@ const Page = () => {
 								autoComplete="current-password"
 								aria-label="Mot de passe"
 								placeholder="********"
-								errorMessage="Mot de passe invalide"
 								value={form.password}
 								onChange={(e) => setform((prev) => ({ ...prev, password: e.target.value }))}
-								onBlur={() => {
-									// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-									!form.password.length || form.password.length < 8
-										? setform((prev) => ({ ...prev, is_password_invalid: true }))
-										: setform((prev) => ({ ...prev, is_password_invalid: false }));
-								}}
 								endContent={
 									isPasswordVisible ? (
 										<EyeSlashIcon className="w-5 h-5 cursor-pointer text-gray-400" onClick={() => setIsPasswordVisible(!isPasswordVisible)} />
@@ -80,32 +72,19 @@ const Page = () => {
 										<EyeIcon className="w-5 h-5 cursor-pointer text-gray-400" onClick={() => setIsPasswordVisible(!isPasswordVisible)} />
 									)
 								}
-								isInvalid={form.is_password_invalid}
 								className="h-12"
 							/>
 						</div>
 						<div className="flex items-center justify-between my-3">
-							<div className="flex items-center">
-								<input
-									type="checkbox"
-									id="remember_me"
-									checked={form.remember_me}
-									onChange={(e) => setform((prev) => ({ ...prev, remember_me: e.target.checked }))}
-									className="h-5 w-5 rounded border-gray-300"
-								/>
-								<label htmlFor="remember_me" className="ml-2 text-sm text-gray-600">
-									Se souvenir de moi
-								</label>
-							</div>
 							<a href="#" className="text-sm font-medium text-blue-600 hover:text-blue-800">
 								Mot de passe oublié ?
 							</a>
 						</div>
 						{errorMessage && <p className="text-red-500 text-center text-sm">{errorMessage}</p>}
 						{successMessage && <p className="text-green-500 text-center text-sm">{successMessage}</p>}
-						<Button 
+						<Button
 							isLoading={loading}
-							disabled={form.is_email_invalid === true || form.is_password_invalid === true || !form.email || !form.password}
+							disabled={form.is_email_invalid === true || !form.email || !form.password}
 							type="submit"
 							className="bg-blue-600 hover:bg-blue-700 text-white py-3 text-base font-medium rounded-md mt-4 w-full"
 						>

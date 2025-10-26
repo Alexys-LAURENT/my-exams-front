@@ -49,31 +49,33 @@ const TopBar = ({ loggedUser }: { loggedUser: Session }) => {
 	};
 
 	return (
-		<div className="flex items-center justify-between w-full px-4 py-3 bg-white border-b border-b-black/10">
-			<span className="font-semibold">
-				<Image src={Logo.src} alt="Logo" width={32} height={32} className="inline-block mr-2" />
-				My exams
-			</span>
-			<div>
-				{selectedLinks().map((link) => (
-					<Link key={link.href} href={link.href} className="ml-4">
-						{link.label}
-					</Link>
-				))}
-			</div>
-			<div>
-				<Popover>
-					<PopoverTrigger>
-						<div className="w-8 h-8 bg-gray-400 rounded-full cursor-pointer"></div>
-					</PopoverTrigger>
-					<PopoverContent>
-						<div className="flex flex-col">
-							<span className="font-bold">{loggedUser!.user.name}</span>
-							<span className="text-sm text-gray-500">{loggedUser!.user.email}</span>
-							<SignOutButton />
-						</div>
-					</PopoverContent>
-				</Popover>
+		<div className="flex justify-center w-full bg-white border-b border-b-black/10">
+			<div className=" px-4 py-3 max-w-[1900px] flex items-center justify-between w-full">
+				<span className="font-semibold">
+					<Image src={Logo.src} alt="Logo" width={32} height={32} className="inline-block mr-2" />
+					My exams
+				</span>
+				<div>
+					{selectedLinks().map((link) => (
+						<Link key={link.href} href={link.href} className="ml-4">
+							{link.label}
+						</Link>
+					))}
+				</div>
+				<div>
+					<Popover>
+						<PopoverTrigger>
+							<div className="w-8 h-8 bg-gray-400 rounded-full cursor-pointer"></div>
+						</PopoverTrigger>
+						<PopoverContent>
+							<div className="flex flex-col">
+								<span className="font-bold">{loggedUser!.user.name}</span>
+								<span className="text-sm text-gray-500">{loggedUser!.user.email}</span>
+								<SignOutButton />
+							</div>
+						</PopoverContent>
+					</Popover>
+				</div>
 			</div>
 		</div>
 	);
