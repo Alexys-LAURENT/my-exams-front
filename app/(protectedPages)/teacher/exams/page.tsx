@@ -26,8 +26,9 @@ const Page = async () => {
 	const idTeacher = loggedUser!.user.idUser;
 	const examsResponse = await getAllExamsForOneTeacher(idTeacher);
 	const exams = 'success' in examsResponse ? examsResponse.data : [];
+	const sortedExams = exams.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 	const examsWithQuestions = await Promise.all(
-		exams.map(async (exam) => {
+		sortedExams.map(async (exam) => {
 			const questionsCount = await getQuestionsCountForOneExam(exam.idExam);
 			return {
 				...exam,
