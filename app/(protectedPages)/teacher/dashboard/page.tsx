@@ -68,7 +68,7 @@ const Page = async () => {
 													<p className="text-gray-900 font-medium group-hover:text-indigo-700 transition-colors">
 														{classe.degree ? classe.degree.name : `Classe ${index + 1}`}
 													</p>
-													<p className="text-xs text-gray-500 mt-1">ID: {classe.idClass}</p>
+													<p className="text-xs text-gray-500 mt-1">Jusqu&apos;au {formatDate(classe.endDate)}</p>
 												</div>
 												<ArrowRightIcon className="w-5 h-5 text-gray-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
 											</div>
