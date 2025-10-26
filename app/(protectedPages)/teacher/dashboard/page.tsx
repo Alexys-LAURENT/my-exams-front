@@ -20,7 +20,9 @@ const Page = async () => {
 	const classes = 'success' in classesResponse ? classesResponse.data : [];
 	const examsResponse = await getAllExamsForOneTeacher(idTeacher);
 	const allExams = 'success' in examsResponse ? examsResponse.data : [];
-	const recentExams = allExams.slice(0, 5);
+	const sortedExams = allExams.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+	const recentExams = sortedExams.slice(0, 5);
+
 	const classesWithDegrees = await Promise.all(
 		classes.map(async (classe) => {
 			const degree = await getClassDegree(classe.idClass);
