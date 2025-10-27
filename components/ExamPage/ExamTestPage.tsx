@@ -7,12 +7,13 @@ import ExamTest from './ExamTest';
 
 interface ExamTestPageProps {
 	idExam: number;
+	idClass: number;
 	preLoadedExam?: Exam;
 	preLoadedQuestionsWithAnswersAndUserResponse?: QuestionWithAnswersAndUserReponse[];
 	forceExamStarted?: boolean;
 }
 
-const ExamTestPage = async ({ idExam, preLoadedExam, preLoadedQuestionsWithAnswersAndUserResponse, forceExamStarted = false }: ExamTestPageProps) => {
+const ExamTestPage = async ({ idExam, idClass, preLoadedExam, preLoadedQuestionsWithAnswersAndUserResponse, forceExamStarted = false }: ExamTestPageProps) => {
 	const session = await auth();
 	if (!session) {
 		redirect('/login');
@@ -43,6 +44,7 @@ const ExamTestPage = async ({ idExam, preLoadedExam, preLoadedQuestionsWithAnswe
 	return (
 		<ExamTest
 			exam={exam}
+			idClass={idClass}
 			questionsCount={totalQuestions}
 			idUser={session.user.idUser}
 			preLoadedQuestionsWithAnswersAndUserResponse={preLoadedQuestionsWithAnswersAndUserResponse}

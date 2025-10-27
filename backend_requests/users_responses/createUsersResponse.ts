@@ -7,7 +7,7 @@ type CreateUsersResponseData = {
 	userResponseAnswers: UserResponseAnswer[];
 };
 
-export const createUsersResponse = async (body: { idExam: number; idQuestion: number; custom?: string; answers?: number[] }) => {
+export const createUsersResponse = async (body: { idExam: number; idQuestion: number; custom?: string; idClass: number; answers?: number[] }) => {
 	return (await fetchApi('/api/users_responses', {
 		method: 'POST',
 		headers: {

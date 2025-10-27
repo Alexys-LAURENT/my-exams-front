@@ -9,13 +9,15 @@ import ButtonFinishExam from './ButtonFinishExam';
 import { TimerData } from './ExamTest';
 interface ExamTestInfosProps {
 	exam: Exam;
+	idStudent: number;
+	idClass: number;
 	questionsCount: number;
 	currentQuestionIndex: number;
 	setCurrentQuestionIndex: Dispatch<SetStateAction<number>>;
 	questions: QuestionWithAnswersAndUserReponse[] | null;
 	timer: TimerData | null;
 }
-const ExamTestInfos = ({ exam, questionsCount, questions, currentQuestionIndex, setCurrentQuestionIndex, timer }: ExamTestInfosProps) => {
+const ExamTestInfos = ({ exam, idStudent, idClass, questionsCount, questions, currentQuestionIndex, setCurrentQuestionIndex, timer }: ExamTestInfosProps) => {
 	// Questions are available if the exam has started
 	const isExamStarted = questions !== null;
 	// Check if all questions have been answered
@@ -62,7 +64,7 @@ const ExamTestInfos = ({ exam, questionsCount, questions, currentQuestionIndex, 
 
 					<Divider />
 					<div className="flex justify-end w-full">
-						<ButtonFinishExam isExamFinished={isExamFinished} idExam={exam.idExam} />
+						<ButtonFinishExam isExamFinished={isExamFinished} idExam={exam.idExam} idStudent={idStudent} idClass={idClass} />
 					</div>
 				</>
 			)}

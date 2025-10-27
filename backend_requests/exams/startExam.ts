@@ -6,8 +6,8 @@ type StartExamResponse = Exam & {
 	questions: QuestionWithAnswers[];
 };
 
-export const startExam = async (idExam: number) => {
-	return (await fetchApi(`/api/exams/${idExam}/start`, {
+export const startExam = async (idStudent: number, idClass: number, idExam: number) => {
+	return (await fetchApi(`/api/classes/${idClass}/students/${idStudent}/exams/${idExam}/start`, {
 		method: 'POST',
 	})) as ApiError | SuccessResponse<StartExamResponse>;
 };

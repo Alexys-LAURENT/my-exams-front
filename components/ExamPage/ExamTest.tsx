@@ -10,6 +10,7 @@ import ExamTestStart from './ExamTestStart';
 
 interface ExamTestProps {
 	exam: Exam;
+	idClass: number;
 	questionsCount: number;
 	idUser: number;
 	preLoadedQuestionsWithAnswersAndUserResponse?: QuestionWithAnswersAndUserReponse[];
@@ -24,7 +25,7 @@ export interface TimerData {
 
 type ExamFinishedSocketData = { error: true; message: string } | { success: true; message: string };
 
-const ExamTest = ({ exam, questionsCount, idUser, forceExamStarted, preLoadedQuestionsWithAnswersAndUserResponse }: ExamTestProps) => {
+const ExamTest = ({ exam, idClass, questionsCount, idUser, forceExamStarted, preLoadedQuestionsWithAnswersAndUserResponse }: ExamTestProps) => {
 	const [isExamStarted, setIsExamStarted] = useState(forceExamStarted !== undefined ? forceExamStarted : preLoadedQuestionsWithAnswersAndUserResponse !== undefined);
 	const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
 	const [questions, setQuestions] = useState<QuestionWithAnswersAndUserReponse[] | null>(preLoadedQuestionsWithAnswersAndUserResponse || null);
@@ -37,7 +38,7 @@ const ExamTest = ({ exam, questionsCount, idUser, forceExamStarted, preLoadedQue
 	useEffect(() => {
 		if (!isExamStarted) return;
 
-		socket.emit('start_exam', { idExam: exam.idExam, idUser: idUser });
+		socket.emit('start_exam', { idExam: exam.idExam, idUser: idUser, idClass: idClass });
 
 		socket.on('exam:tick', (data: TimerData) => {
 			setTimer(data);
@@ -53,11 +54,11 @@ const ExamTest = ({ exam, questionsCount, idUser, forceExamStarted, preLoadedQue
 
 		// Cleanup
 		return () => {
-			socket.emit('stop_exam', { idExam: exam.idExam, idUser: idUser });
+			socket.emit('stop_exam', { idExam: exam.idExam, idUser: idUser, idClass: idClass });
 			socket.off('exam:tick');
 			socket.off('exam:finished');
 		};
-	}, [exam.idExam, idUser, isExamStarted, router]);
+	}, [exam.idExam, idUser, idClass, isExamStarted, router]);
 
 	useEffect(() => {
 		if (!isExamStarted) return;
@@ -99,7 +100,7 @@ const ExamTest = ({ exam, questionsCount, idUser, forceExamStarted, preLoadedQue
 	const handleStartExam = async () => {
 		try {
 			setIsLoading(true);
-			const resStart = await startExam(exam.idExam);
+			const resStart = await startExam(idUser, idClass, exam.idExam);
 			if ('error' in resStart) {
 				throw new Error('Error starting exam');
 			}
@@ -118,6 +119,8 @@ const ExamTest = ({ exam, questionsCount, idUser, forceExamStarted, preLoadedQue
 		<div className="flex flex-col flex-1 gap-4 p-4">
 			<ExamTestInfos
 				exam={exam}
+				idStudent={idUser}
+				idClass={idClass}
 				questionsCount={questionsCount}
 				currentQuestionIndex={currentQuestionIndex}
 				setCurrentQuestionIndex={setCurrentQuestionIndex}
@@ -128,6 +131,7 @@ const ExamTest = ({ exam, questionsCount, idUser, forceExamStarted, preLoadedQue
 				<ExamTestQuestion
 					currentQuestion={questions![currentQuestionIndex]}
 					idExam={exam.idExam}
+					idClass={idClass}
 					setQuestions={setQuestions}
 					currentQuestionIndex={currentQuestionIndex}
 					setCurrentQuestionIndex={setCurrentQuestionIndex}

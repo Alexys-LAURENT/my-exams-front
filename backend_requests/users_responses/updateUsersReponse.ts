@@ -7,7 +7,7 @@ type UpdateUsersResponseData = {
 	userResponseAnswers: UserResponseAnswer[];
 };
 
-export const updateUsersResponse = async (idUserResponse: number, body: { custom?: string; answers?: number[] }) => {
+export const updateUsersResponse = async (idUserResponse: number, body: { idClass: number; custom?: string; answers?: number[] }) => {
 	return (await fetchApi(`/api/users_responses/${idUserResponse}`, {
 		method: 'PUT',
 		headers: {

@@ -17,12 +17,13 @@ interface ExamTestQuestionProps {
 	currentQuestion: QuestionWithAnswersAndUserReponse;
 	setQuestions: React.Dispatch<React.SetStateAction<QuestionWithAnswersAndUserReponse[] | null>>;
 	idExam: number;
+	idClass: number;
 	currentQuestionIndex: number;
 	setCurrentQuestionIndex: React.Dispatch<React.SetStateAction<number>>;
 	questionsCount: number;
 }
 
-const ExamTestQuestion = ({ currentQuestion, idExam, setQuestions, currentQuestionIndex, setCurrentQuestionIndex, questionsCount }: ExamTestQuestionProps) => {
+const ExamTestQuestion = ({ currentQuestion, idExam, idClass, setQuestions, currentQuestionIndex, setCurrentQuestionIndex, questionsCount }: ExamTestQuestionProps) => {
 	const [selectedAnswers, setSelectedAnswers] = useState<number[]>([]);
 	const [customAnswer, setCustomAnswer] = useState('');
 	const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -51,6 +52,7 @@ const ExamTestQuestion = ({ currentQuestion, idExam, setQuestions, currentQuesti
 
 				if (hasAlreadyAnswered) {
 					const updatedUserResponse = await updateUsersResponse(currentQuestion.userResponse!.idUserResponse, {
+						idClass: idClass,
 						answers: data.selectedAnswers,
 						custom: data.customAnswer,
 					});
@@ -61,6 +63,7 @@ const ExamTestQuestion = ({ currentQuestion, idExam, setQuestions, currentQuesti
 				} else {
 					const newUserResponse = await createUsersResponse({
 						idExam: idExam,
+						idClass: idClass,
 						idQuestion: currentQuestion.idQuestion,
 						answers: data.selectedAnswers,
 						custom: data.customAnswer,
@@ -96,7 +99,7 @@ const ExamTestQuestion = ({ currentQuestion, idExam, setQuestions, currentQuesti
 				setCustomAnswer(previousCustomAnswer);
 			}
 		},
-		[currentQuestion, idExam, setQuestions]
+		[currentQuestion, idExam, idClass, setQuestions]
 	);
 
 	const debouncedSubmitCustomAnswer = useCallback(

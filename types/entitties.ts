@@ -98,6 +98,7 @@ export type UserResponseAnswer = {
 export type Evaluation = {
 	idEvaluation: number;
 	note: string | null;
+	commentary: string | null;
 	idStudent: number;
 	idTeacher: number;
 	idUserResponse: number;
@@ -124,10 +125,16 @@ export type QuestionWithDetails = Question & {
 	evaluation: Evaluation | null;
 };
 
-export type ExamRecap = Exam & {
-	questions: QuestionWithDetails[];
-	examGrade: ExamGrade;
-};
+export type ExamRecap =
+	| (Exam & {
+			isExamTimeFinished: true;
+			questions: QuestionWithDetails[];
+			examGrade: ExamGrade;
+	  })
+	| (Exam & {
+			isExamTimeFinished: false;
+			examGrade: ExamGrade;
+	  });
 
 export type QuestionWithAnswers = Question & {
 	answers: AnswerWithoutCorrect[];

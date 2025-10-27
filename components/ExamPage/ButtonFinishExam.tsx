@@ -7,17 +7,19 @@ import { useState } from 'react';
 
 interface ButtonFinishExamProps {
 	idExam: number;
+	idStudent: number;
+	idClass: number;
 	isExamFinished: boolean;
 }
 
-const ButtonFinishExam = ({ idExam, isExamFinished }: ButtonFinishExamProps) => {
+const ButtonFinishExam = ({ idExam, idStudent, idClass, isExamFinished }: ButtonFinishExamProps) => {
 	const [isPopOverOpen, setIsPopOverOpen] = useState(false);
 
 	const router = useRouter();
 
 	const handleFinishExam = async () => {
 		try {
-			await stopExam(idExam);
+			await stopExam(idStudent, idClass, idExam);
 			router.refresh();
 		} catch (error) {
 			console.error('Error stopping exam:', error);
