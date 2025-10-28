@@ -1,14 +1,15 @@
 import { getOneTeacher } from '@/backend_requests/teachers/getOneTeacher';
-import { ExamRecap } from '@/types/entitties';
+import { ExamClass, ExamRecap } from '@/types/entitties';
 import { formatExamTime } from '@/utils/formatExamTime';
+import moment from 'moment';
 import TimerIcon from '../svg/TimerIcon';
 
 interface StudentExamRecapUnavailableProps {
 	examData: ExamRecap & { isExamTimeFinished: false };
-	idStudent: number;
+	examClass: ExamClass;
 }
 
-const StudentExamRecapUnavailable = async ({ examData }: StudentExamRecapUnavailableProps) => {
+const StudentExamRecapUnavailable = async ({ examData, examClass }: StudentExamRecapUnavailableProps) => {
 	const teacher = await getOneTeacher(examData.idTeacher);
 
 	if ('error' in teacher) {
@@ -42,11 +43,11 @@ const StudentExamRecapUnavailable = async ({ examData }: StudentExamRecapUnavail
 					</div>
 					<div className="p-3 rounded-md bg-orange-50">
 						<p className="text-sm text-gray-600">Note</p>
-						<p className="text-lg font-semibold text-orange-700">{examData.examGrade.note !== null ? `${examData.examGrade.note}/20` : 'Non noté'}</p>
+						<p className="text-lg font-semibold text-orange-700">{examData.examGrade!.note !== null ? `${examData.examGrade!.note}/20` : 'Non noté'}</p>
 					</div>
 					<div className="p-3 rounded-md bg-violet-50">
 						<p className="text-sm text-gray-600">Statut</p>
-						<p className="text-lg font-semibold text-violet-700">{examData.examGrade.status.charAt(0).toUpperCase() + examData.examGrade.status.slice(1)}</p>
+						<p className="text-lg font-semibold text-violet-700">{examData.examGrade!.status.charAt(0).toUpperCase() + examData.examGrade!.status.slice(1)}</p>
 					</div>
 				</div>
 			</div>
@@ -68,7 +69,8 @@ const StudentExamRecapUnavailable = async ({ examData }: StudentExamRecapUnavail
 					<p className="mb-4 text-gray-600">Le récapitulatif détaillé de cet examen sera disponible une fois que la période de l&apos;examen sera terminée.</p>
 					<div className="p-4 rounded-lg bg-blue-50">
 						<p className="text-sm text-blue-800">
-							<span className="font-semibold">Note :</span> Vous pourrez consulter vos réponses et les corrections après la fin de la période d&apos;examen.
+							<span className="font-semibold">Note :</span> Vous pourrez consulter vos réponses et les corrections après la fin de la période d&apos;examen le{' '}
+							{moment(examClass.end_date).format('DD/MM/YYYY HH:mm')}.
 						</p>
 					</div>
 				</div>

@@ -1,8 +1,9 @@
 'use client';
-import { Exam, QuestionWithAnswersAndUserReponse } from '@/types/entitties';
+import { Exam, ExamClass, QuestionWithAnswersAndUserReponse } from '@/types/entitties';
 import { formatExamTime } from '@/utils/formatExamTime';
 import { Button } from '@heroui/button';
 import { Divider } from '@heroui/divider';
+import moment from 'moment';
 import { Dispatch, SetStateAction } from 'react';
 import TimerIcon from '../svg/TimerIcon';
 import ButtonFinishExam from './ButtonFinishExam';
@@ -16,8 +17,9 @@ interface ExamTestInfosProps {
 	setCurrentQuestionIndex: Dispatch<SetStateAction<number>>;
 	questions: QuestionWithAnswersAndUserReponse[] | null;
 	timer: TimerData | null;
+	examClass: ExamClass;
 }
-const ExamTestInfos = ({ exam, idStudent, idClass, questionsCount, questions, currentQuestionIndex, setCurrentQuestionIndex, timer }: ExamTestInfosProps) => {
+const ExamTestInfos = ({ exam, idStudent, idClass, questionsCount, questions, currentQuestionIndex, setCurrentQuestionIndex, timer, examClass }: ExamTestInfosProps) => {
 	// Questions are available if the exam has started
 	const isExamStarted = questions !== null;
 	// Check if all questions have been answered
@@ -32,7 +34,10 @@ const ExamTestInfos = ({ exam, idStudent, idClass, questionsCount, questions, cu
 					<div>
 						<h1 className="text-base font-bold md:text-xl">{exam.title}</h1>
 						<p className="text-sm md:text-md">{exam.desc}</p>
-						<p className="text-sm md:text-md">
+						<p className="text-gray-600 text-sm ">{`Réalisable du ${moment(examClass.start_date).format('DD/MM/YYYY HH:mm')} au ${moment(examClass.end_date).format(
+							'DD/MM/YYYY HH:mm'
+						)}`}</p>
+						<p className="text-sm md:text-md text-gray-600">
 							{questionsCount} question{questionsCount > 1 ? 's' : ''}
 						</p>
 					</div>

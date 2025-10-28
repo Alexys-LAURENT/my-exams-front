@@ -44,6 +44,13 @@ export type Exam = {
 	updatedAt: string | null;
 };
 
+export type ExamClass = {
+	idExam: number;
+	idClass: number;
+	start_date: string;
+	end_date: string;
+};
+
 export type ExamWithDates = Exam & {
 	start_date: string;
 	end_date: string;
@@ -129,11 +136,11 @@ export type ExamRecap =
 	| (Exam & {
 			isExamTimeFinished: true;
 			questions: QuestionWithDetails[];
-			examGrade: ExamGrade;
+			examGrade: ExamGrade | null;
 	  })
 	| (Exam & {
 			isExamTimeFinished: false;
-			examGrade: ExamGrade;
+			examGrade: ExamGrade | null;
 	  });
 
 export type QuestionWithAnswers = Question & {

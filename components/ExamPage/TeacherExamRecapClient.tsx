@@ -3,7 +3,7 @@
 import { createEvaluation } from '@/backend_requests/evaluations/createEvaluation';
 import { updateEvaluation } from '@/backend_requests/evaluations/updateEvaluation';
 import { updateExamGrade } from '@/backend_requests/exam_grades/updateExamGrade';
-import { ExamRecap, QuestionWithDetails } from '@/types/entitties';
+import { ExamClass, ExamRecap, QuestionWithDetails } from '@/types/entitties';
 import { formatExamTime } from '@/utils/formatExamTime';
 import { Button } from '@heroui/button';
 import { Textarea } from '@heroui/input';
@@ -25,12 +25,14 @@ type LocalEvaluation = {
 interface TeacherExamRecapClientProps {
 	examData: ExamRecap & { isExamTimeFinished: true };
 	student: { name: string; lastName: string };
+	examClass: ExamClass;
 }
 
-const TeacherExamRecapClient = ({ examData, student }: TeacherExamRecapClientProps) => {
+const TeacherExamRecapClient = ({ examData, student, examClass }: TeacherExamRecapClientProps) => {
 	const router = useRouter();
 
-	const isCorrected = examData.examGrade.status === 'corrigé';
+	const isCorrected = examData.examGrade?.status === 'corrigé';
+	const studentHasDoneExam = examData.examGrade !== null;
 
 	const submissionDate = useMemo(() => {
 		const last = (examData.questions as QuestionWithDetails[])[(examData.questions as QuestionWithDetails[]).length - 1];
@@ -99,7 +101,7 @@ const TeacherExamRecapClient = ({ examData, student }: TeacherExamRecapClientPro
 	};
 
 	const sendFinalGrade = async () => {
-		const res = await updateExamGrade(examData.examGrade.idExamGrade, { note: totalNote, status: 'corrigé' });
+		const res = await updateExamGrade(examData.examGrade!.idExamGrade, { note: totalNote, status: 'corrigé' });
 		if ('error' in res) {
 			console.error('updateExamGrade error', res.error);
 			return;
@@ -119,6 +121,9 @@ const TeacherExamRecapClient = ({ examData, student }: TeacherExamRecapClientPro
 						<div className="">
 							<h1 className="text-3xl font-bold text-gray-800">{examData.title}</h1>
 							{examData.desc && <p className="text-gray-600 ">{examData.desc}</p>}
+							<p className="text-gray-600 text-sm ">{`Réalisable du ${moment(examClass.start_date).format('DD/MM/YYYY HH:mm')} au ${moment(examClass.end_date).format(
+								'DD/MM/YYYY HH:mm'
+							)}`}</p>
 							<p className="text-sm text-gray-600">
 								{totalQuestions} question{totalQuestions > 1 ? 's' : ''}
 							</p>
@@ -138,16 +143,20 @@ const TeacherExamRecapClient = ({ examData, student }: TeacherExamRecapClientPro
 					<div className="p-3 rounded-md bg-green-50">
 						<p className="text-sm text-gray-600">Rendu le</p>
 						<p className="text-lg font-semibold text-green-700">
-							{moment(submissionDate).format('MM/DD/YYYY')} à {moment(submissionDate).format('HH:mm')}
+							{studentHasDoneExam ? `${moment(submissionDate).format('MM/DD/YYYY')} à ${moment(submissionDate).format('HH:mm')}` : 'Non rendu'}
 						</p>
 					</div>
 					<div className="p-3 rounded-md bg-orange-50">
 						<p className="text-sm text-gray-600">Note</p>
-						<p className="text-lg font-semibold text-orange-700">{examData.examGrade.note !== null ? `${examData.examGrade.note}/20` : 'Non noté'}</p>
+						<p className="text-lg font-semibold text-orange-700">
+							{studentHasDoneExam ? (examData.examGrade!.note !== null ? `${examData.examGrade!.note}/20` : 'Pas encore noté') : 'Non évalué'}
+						</p>
 					</div>
 					<div className="p-3 rounded-md bg-violet-50">
 						<p className="text-sm text-gray-600">Statut</p>
-						<p className="text-lg font-semibold text-violet-700">{examData.examGrade.status.charAt(0).toUpperCase() + examData.examGrade.status.slice(1)}</p>
+						<p className="text-lg font-semibold text-violet-700">
+							{studentHasDoneExam ? examData.examGrade!.status.charAt(0).toUpperCase() + examData.examGrade!.status.slice(1) : 'Non évalué'}
+						</p>
 					</div>
 				</div>
 			</div>
@@ -158,7 +167,7 @@ const TeacherExamRecapClient = ({ examData, student }: TeacherExamRecapClientPro
 					const evalForQ = evaluations.find((x) => x.idQuestion === question.idQuestion);
 					const needsCorrection = !isCorrected && !question.isQcm && (!!evalForQ ? evalForQ.idEvaluation === null || evalForQ.note === null : true);
 					return (
-						<div key={question.idQuestion} className={`p-6 bg-white border rounded-lg ${needsCorrection ? 'border-red-500' : 'border-black/10'}`}>
+						<div key={question.idQuestion} className={`p-6 bg-white border rounded-lg ${needsCorrection && studentHasDoneExam ? 'border-red-500' : 'border-black/10'}`}>
 							{/* En-tête de la question */}
 							<div className="flex flex-col items-start justify-between gap-2 mb-4 md:gap-0 md:flex-row">
 								<h2 className="text-xl font-semibold text-gray-800">Question {index + 1}</h2>
@@ -238,7 +247,7 @@ const TeacherExamRecapClient = ({ examData, student }: TeacherExamRecapClientPro
 									)}
 
 									{/* Section de notation pour les questions non-QCM */}
-									{!isCorrected && (
+									{!isCorrected && studentHasDoneExam && (
 										<div className="p-4 mt-4 border-2 border-blue-200 rounded-lg bg-blue-50">
 											<p className="mb-3 text-sm font-semibold text-blue-900">Notation</p>
 											<div className="flex flex-col gap-3">
@@ -304,7 +313,7 @@ const TeacherExamRecapClient = ({ examData, student }: TeacherExamRecapClientPro
 			</div>
 
 			{/* Bouton d'envoi de la note globale (bleu, positionné en bas à droite) */}
-			{!isCorrected && (
+			{!isCorrected && studentHasDoneExam && (
 				<div className="fixed z-40 flex items-center self-center gap-3 p-3 bg-white border rounded-md shadow-md md:self-auto border-black/10 bottom-4 md:right-6">
 					<div className="px-3 py-2 text-sm font-medium text-gray-800 border rounded-md border-black/10 bg-gray-50">
 						Total: <span className="font-semibold">{totalNote.toFixed(2)}</span> / 20

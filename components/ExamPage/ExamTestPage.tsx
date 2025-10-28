@@ -3,17 +3,19 @@ import { getQuestionsCountForOneExam } from '@/backend_requests/questions/getQue
 import { Exam, QuestionWithAnswersAndUserReponse } from '@/types/entitties';
 import { auth } from '@/utils/auth';
 import { redirect } from 'next/navigation';
+import { ExamClass } from '../../types/entitties';
 import ExamTest from './ExamTest';
 
 interface ExamTestPageProps {
 	idExam: number;
 	idClass: number;
+	examClass: ExamClass;
 	preLoadedExam?: Exam;
 	preLoadedQuestionsWithAnswersAndUserResponse?: QuestionWithAnswersAndUserReponse[];
 	forceExamStarted?: boolean;
 }
 
-const ExamTestPage = async ({ idExam, idClass, preLoadedExam, preLoadedQuestionsWithAnswersAndUserResponse, forceExamStarted = false }: ExamTestPageProps) => {
+const ExamTestPage = async ({ idExam, idClass, examClass, preLoadedExam, preLoadedQuestionsWithAnswersAndUserResponse, forceExamStarted = false }: ExamTestPageProps) => {
 	const session = await auth();
 	if (!session) {
 		redirect('/login');
@@ -49,6 +51,8 @@ const ExamTestPage = async ({ idExam, idClass, preLoadedExam, preLoadedQuestions
 			idUser={session.user.idUser}
 			preLoadedQuestionsWithAnswersAndUserResponse={preLoadedQuestionsWithAnswersAndUserResponse}
 			forceExamStarted={forceExamStarted}
+			loggedUser={session.user}
+			examClass={examClass}
 		/>
 	);
 };

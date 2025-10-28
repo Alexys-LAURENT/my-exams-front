@@ -1,20 +1,24 @@
 import { getOneTeacher } from '@/backend_requests/teachers/getOneTeacher';
-import { ExamRecap } from '@/types/entitties';
+import { ExamClass, ExamRecap } from '@/types/entitties';
 import { formatExamTime } from '@/utils/formatExamTime';
+import { shuffleQuestions } from '@/utils/shuffleQuestions';
 import moment from 'moment';
+import { User } from 'next-auth';
 import TimerIcon from '../svg/TimerIcon';
 
 interface StudentExamRecapProps {
 	examData: ExamRecap & { isExamTimeFinished: true };
 	idStudent: number;
+	loggedUser: User;
+	examClass: ExamClass;
 }
 
-const StudentExamRecap = async ({ examData }: StudentExamRecapProps) => {
+const StudentExamRecap = async ({ examData, loggedUser, examClass }: StudentExamRecapProps) => {
 	const teacher = await getOneTeacher(examData.idTeacher);
-
 	if ('error' in teacher) {
 		throw new Error('Error fetching teacher data');
 	}
+	const shuffledQuestions = shuffleQuestions(examData.questions, loggedUser.name, loggedUser.lastName);
 
 	const submissionDate = new Date(examData.questions[examData.questions.length - 1].userResponse.createdAt);
 	const totalQuestions = examData.questions.length;
@@ -31,6 +35,9 @@ const StudentExamRecap = async ({ examData }: StudentExamRecapProps) => {
 						<div className="">
 							<h1 className="text-3xl font-bold text-gray-800">{examData.title}</h1>
 							{examData.desc && <p className="text-gray-600 ">{examData.desc}</p>}
+							<p className="text-gray-600 text-sm ">{`Réalisable du ${moment(examClass.start_date).format('DD/MM/YYYY HH:mm')} au ${moment(examClass.end_date).format(
+								'DD/MM/YYYY HH:mm'
+							)}`}</p>
 							<p className="text-sm text-gray-600">
 								{totalQuestions} question{totalQuestions > 1 ? 's' : ''}
 							</p>
@@ -50,23 +57,27 @@ const StudentExamRecap = async ({ examData }: StudentExamRecapProps) => {
 					<div className="p-3 rounded-md bg-green-50">
 						<p className="text-sm text-gray-600">Rendu le</p>
 						<p className="text-lg font-semibold text-green-700">
-							{moment(submissionDate).format('MM/DD/YYYY')} à {moment(submissionDate).format('HH:mm')}
+							{examData.examGrade ? `${moment(submissionDate).format('MM/DD/YYYY')} à ${moment(submissionDate).format('HH:mm')}` : 'Non rendu'}
 						</p>
 					</div>
 					<div className="p-3 rounded-md bg-orange-50">
 						<p className="text-sm text-gray-600">Note</p>
-						<p className="text-lg font-semibold text-orange-700">{examData.examGrade.note !== null ? `${examData.examGrade.note}/20` : 'Non noté'}</p>
+						<p className="text-lg font-semibold text-orange-700">
+							{examData.examGrade ? (examData.examGrade.note !== null ? `${examData.examGrade.note}/20` : 'Pas encore noté') : 'Non évalué'}
+						</p>
 					</div>
 					<div className="p-3 rounded-md bg-violet-50">
 						<p className="text-sm text-gray-600">Statut</p>
-						<p className="text-lg font-semibold text-violet-700">{examData.examGrade.status.charAt(0).toUpperCase() + examData.examGrade.status.slice(1)}</p>
+						<p className="text-lg font-semibold text-violet-700">
+							{examData.examGrade ? examData.examGrade.status.charAt(0).toUpperCase() + examData.examGrade.status.slice(1) : 'Non évalué'}
+						</p>
 					</div>
 				</div>
 			</div>
 
 			{/* Liste des questions */}
 			<div className="flex flex-col gap-4">
-				{examData.questions.map((question, index) => (
+				{shuffledQuestions.map((question, index) => (
 					<div key={question.idQuestion} className="p-6 bg-white border rounded-lg border-black/10 ">
 						{/* En-tête de la question */}
 						<div className="flex flex-col items-start justify-between gap-2 mb-4 md:gap-0 md:flex-row">
@@ -154,6 +165,12 @@ const StudentExamRecap = async ({ examData }: StudentExamRecapProps) => {
 									<span className="text-sm text-gray-600">Note obtenue :</span>
 									<span className="text-lg font-semibold text-blue-600">{question.evaluation.note !== null ? `${question.evaluation.note}/${question.maxPoints}` : 'Non noté'}</span>
 								</div>
+								{question.evaluation.commentary && (
+									<div className="flex flex-col items-start gap-2">
+										<span className="text-sm text-gray-600">Commentaire du professeur :</span>
+										<span className="p-3 border border-green-200 rounded-md bg-green-50 w-full">{question.evaluation.commentary}</span>
+									</div>
+								)}
 							</div>
 						)}
 					</div>
