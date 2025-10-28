@@ -44,6 +44,13 @@ export type Exam = {
 	updatedAt: string | null;
 };
 
+export type ExamClass = {
+	idExam: number;
+	idClass: number;
+	start_date: string;
+	end_date: string;
+};
+
 export type ExamWithDates = Exam & {
 	start_date: string;
 	end_date: string;
@@ -97,7 +104,8 @@ export type UserResponseAnswer = {
 
 export type Evaluation = {
 	idEvaluation: number;
-	note: number | null;
+	note: string | null;
+	commentary: string | null;
 	idStudent: number;
 	idTeacher: number;
 	idUserResponse: number;
@@ -124,7 +132,25 @@ export type QuestionWithDetails = Question & {
 	evaluation: Evaluation | null;
 };
 
-export type ExamRecap = Exam & {
-	quetions: QuestionWithDetails[];
-	examGrade: ExamGrade;
+export type ExamRecap =
+	| (Exam & {
+			isExamTimeFinished: true;
+			questions: QuestionWithDetails[];
+			examGrade: ExamGrade | null;
+	  })
+	| (Exam & {
+			isExamTimeFinished: false;
+			examGrade: ExamGrade | null;
+	  });
+
+export type QuestionWithAnswers = Question & {
+	answers: AnswerWithoutCorrect[];
+};
+
+export type QuestionWithAnswersAndUserReponse = QuestionWithAnswers & {
+	userResponse?: {
+		idUserResponse: number;
+		custom: string | null;
+		selectedAnswers: number[];
+	};
 };

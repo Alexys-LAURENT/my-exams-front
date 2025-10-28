@@ -10,8 +10,8 @@ type StopExamResponse = {
 	};
 };
 
-export const stopExam = async (idExam: number) => {
-	return (await fetchApi(`/api/exams/${idExam}/stop`, {
+export const stopExam = async (idStudent: number, idClass: number, idExam: number) => {
+	return (await fetchApi(`/api/classes/${idClass}/students/${idStudent}/exams/${idExam}/stop`, {
 		method: 'POST',
 	})) as ApiError | StopExamResponse;
 };
