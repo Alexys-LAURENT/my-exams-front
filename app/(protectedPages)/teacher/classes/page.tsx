@@ -16,13 +16,9 @@ const formatDate = (dateString: string) => {
 const Page = async () => {
 	const loggedUser = await auth();
 	const idTeacher = loggedUser!.user.idUser;
-
 	const classesResponse = await getAllClassesForOneTeacher(idTeacher);
 	const classes = 'success' in classesResponse ? classesResponse.data : [];
-
-	// Trier les classes par date de fin décroissante (plus récente en premier)
 	const sortedClasses = classes.sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime());
-
 	const classesWithDetails = await Promise.all(
 		sortedClasses.map(async (classe) => {
 			const degreeResponse = await getClassDegree(classe.idClass);
