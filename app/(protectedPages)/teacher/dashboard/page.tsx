@@ -20,6 +20,9 @@ const Page = async () => {
 	}
 	const classes = 'success' in classesResponse ? classesResponse.data : [];
 	const examsResponse = await getAllExamsForOneTeacher(idTeacher);
+	if (!('success' in examsResponse)) {
+		throw new Error('Erreur lors du chargement des examens');
+	}
 	const allExams = 'success' in examsResponse ? examsResponse.data : [];
 	const sortedExams = allExams.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 	const recentExams = sortedExams.slice(0, 5);
@@ -35,7 +38,7 @@ const Page = async () => {
 	);
 
 	return (
-		<div className="min-h-screen from-blue-50 to-indigo-100 p-6">
+		<div className="min-h-screen p-6">
 			<div className="max-w-7xl mx-auto">
 				<div className="mb-8">
 					<h1 className="text-4xl font-bold text-gray-900 mb-2">Dashboard Professeur</h1>
