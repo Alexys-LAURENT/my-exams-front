@@ -3,7 +3,7 @@ import { getClassDegree } from '@/backend_requests/degrees/getClassDegree';
 import { getExamGradeOneStudent } from '@/backend_requests/exam_grades/getExamGradeOneStudent';
 import { auth } from '@/utils/auth';
 import { ExamWithDates, ExamGrade } from '@/types/entitties';
-import { DocumentTextIcon, CheckCircleIcon, TrophyIcon, StarIcon, ClockIcon, CalendarIcon } from '@heroicons/react/24/outline';
+import { DocumentTextIcon, ClockIcon, CalendarIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
 type ExamWithGrade = ExamWithDates & {
@@ -146,61 +146,6 @@ const page = async ({ params }: { params: Promise<{ idClass: string }> }) => {
 							year: 'numeric',
 						})}
 					</p>
-				</div>
-
-				{/* Stats Cards */}
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-					{/* Examens à faire */}
-					<div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
-						<div className="flex items-center justify-between">
-							<div>
-								<p className="text-gray-500 text-sm font-medium mb-1">Examens à faire</p>
-								<p className="text-3xl font-bold text-gray-900">{totalPendingExams}</p>
-							</div>
-							<div className="bg-blue-100 p-3 rounded-lg">
-								<DocumentTextIcon className="w-8 h-8 text-blue-600" />
-							</div>
-						</div>
-					</div>
-
-					{/* Examens passés */}
-					<div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
-						<div className="flex items-center justify-between">
-							<div>
-								<p className="text-gray-500 text-sm font-medium mb-1">Examens passés</p>
-								<p className="text-3xl font-bold text-gray-900">{totalCompletedExams}</p>
-							</div>
-							<div className="bg-green-100 p-3 rounded-lg">
-								<CheckCircleIcon className="w-8 h-8 text-green-600" />
-							</div>
-						</div>
-					</div>
-
-					{/* Rang classé */}
-					<div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
-						<div className="flex items-center justify-between">
-							<div>
-								<p className="text-gray-500 text-sm font-medium mb-1">Rang classé</p>
-								<p className="text-3xl font-bold text-gray-900">{classRank}</p>
-							</div>
-							<div className="bg-purple-100 p-3 rounded-lg">
-								<TrophyIcon className="w-8 h-8 text-purple-600" />
-							</div>
-						</div>
-					</div>
-
-					{/* Moyenne générale */}
-					<div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
-						<div className="flex items-center justify-between">
-							<div>
-								<p className="text-gray-500 text-sm font-medium mb-1">Moyenne générale</p>
-								<p className="text-3xl font-bold text-gray-900">{averageGrade.toFixed(1)}/20</p>
-							</div>
-							<div className="bg-yellow-100 p-3 rounded-lg">
-								<StarIcon className="w-8 h-8 text-yellow-600" />
-							</div>
-						</div>
-					</div>
 				</div>
 
 				{/* Examens à faire */}
