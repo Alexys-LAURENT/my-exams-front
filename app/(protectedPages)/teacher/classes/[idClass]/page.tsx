@@ -1,13 +1,15 @@
 import { getOneClass } from '@/backend_requests/classes/getOneClass';
 import { getClassDegree } from '@/backend_requests/degrees/getClassDegree';
 import { getStudentsOfClass } from '@/backend_requests/students/getStudentsOfClass';
-import { AcademicCapIcon, CalendarIcon, UsersIcon } from '@heroicons/react/24/outline';
+import { AcademicCapIcon, CalendarIcon, UsersIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import { getExamsOfClass } from '@/backend_requests/exams/getExamsOfClass';
+import ExamComp from '@/components/TeacherClassByIdPage/examComp';
 
 const formatDate = (dateString: string) => {
 	return new Date(dateString).toLocaleDateString('fr-FR', {
 		day: 'numeric',
-		month: 'long',
+		month: 'short',
 		year: 'numeric',
 	});
 };
@@ -15,11 +17,25 @@ const formatDate = (dateString: string) => {
 const Page = async ({ params }: { params: { idClass: string } }) => {
 	const idClass = parseInt(params.idClass);
 	const classResponse = await getOneClass(idClass);
+	if (!('success' in classResponse)) {
+		throw new Error('Erreur lors du chargement des classes');
+	}
 	const classe = 'success' in classResponse ? classResponse.data : null;
 	const degreeResponse = classe ? await getClassDegree(idClass) : null;
-	const degree = degreeResponse && 'success' in degreeResponse ? degreeResponse.data : null;
+	if (degreeResponse && !('success' in degreeResponse)) {
+		throw new Error('Erreur lors du chargement du diplôme');
+	}
+	const degree = degreeResponse ? degreeResponse.data : null;
 	const studentsResponse = classe ? await getStudentsOfClass(idClass) : null;
-	const students = studentsResponse && 'success' in studentsResponse ? studentsResponse.data : [];
+	if (studentsResponse && !('success' in studentsResponse)) {
+		throw new Error('Erreur lors du chargement des élèves');
+	}
+	const students = studentsResponse ? studentsResponse.data : [];
+	const examsResponse = classe ? await getExamsOfClass(idClass) : null;
+	if (examsResponse && !('success' in examsResponse)) {
+		throw new Error('Erreur lors du chargement des examens');
+	}
+	const exams = examsResponse ? examsResponse.data : [];
 
 	if (!classe) {
 		return (
@@ -34,7 +50,7 @@ const Page = async ({ params }: { params: { idClass: string } }) => {
 	}
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+		<div className="min-h-screen p-6">
 			<div className="max-w-6xl mx-auto">
 				<Link href="/teacher/classes" className="inline-flex items-center text-indigo-600 hover:text-indigo-800 mb-6 font-medium">
 					Retour aux classes
@@ -79,8 +95,11 @@ const Page = async ({ params }: { params: { idClass: string } }) => {
 									</div>
 								) : (
 									<div className="space-y-2">
-										{students.map((student, index) => (
-											<div className="block bg-white hover:bg-gray-50 transition-colors duration-200 px-4 py-3 rounded border-b border-gray-300 last:border-b-0">
+										{students.map((student) => (
+											<div
+												key={student.idUser}
+												className="block bg-white hover:bg-gray-50 transition-colors duration-200 px-4 py-3 rounded border-b border-gray-300 last:border-b-0"
+											>
 												<div className="flex items-center justify-between">
 													<span className="text-gray-900">
 														{student.name} {student.lastName}
@@ -88,6 +107,24 @@ const Page = async ({ params }: { params: { idClass: string } }) => {
 													<span className="text-sm text-gray-500">{student.email}</span>
 												</div>
 											</div>
+										))}
+									</div>
+								)}
+							</div>
+							<div className="flex items-center gap-3 mb-4">
+								<DocumentTextIcon className="w-6 h-6 text-gray" />
+								<h2 className="text-xl font-semibold text-gray">examens de la classe ({exams.length})</h2>
+							</div>
+							<div className="bg-gray-200 rounded-lg p-4">
+								{exams.length === 0 ? (
+									<div className="text-center py-8">
+										<DocumentTextIcon className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+										<p className="text-gray-600">Aucun examens attribué à cette classe</p>
+									</div>
+								) : (
+									<div className="space-y-2">
+										{exams.map((exam) => (
+											<ExamComp key={exam.idExam} exam={exam} idClass={classe.idClass} />
 										))}
 									</div>
 								)}
