@@ -16,11 +16,15 @@ const AdminDashboard = async () => {
 		getAllDegrees(),
 	]);
 
+	if(!('success' in studentsData) || !('success' in teachersData) || !('success' in classesData) || !('success' in degreesData) ){
+		throw new Error('Error fetching data');
+	}
+
 	// Extraire les counts
-	const studentsCount = 'data' in studentsData ? studentsData.data.length : 0;
-	const teachersCount = 'data' in teachersData ? teachersData.data.length : 0;
-	const classesCount = 'data' in classesData ? classesData.data.length : 0;
-	const degreesCount = 'data' in degreesData ? degreesData.data.length : 0;
+	const studentsCount = studentsData.data.length;
+	const teachersCount = teachersData.data.length;
+	const classesCount = classesData.data.length;
+	const degreesCount = degreesData.data.length;
 
 	const dashboardCards = [
 		{
