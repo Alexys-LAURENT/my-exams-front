@@ -18,12 +18,12 @@ const Page = async () => {
 	if (!('success' in classesResponse)) {
 		throw new Error('Erreur lors du chargement des classes');
 	}
-	const classes = 'success' in classesResponse ? classesResponse.data : [];
+	const classes = classesResponse.data;
 	const examsResponse = await getAllExamsForOneTeacher(idTeacher);
 	if (!('success' in examsResponse)) {
 		throw new Error('Erreur lors du chargement des examens');
 	}
-	const allExams = 'success' in examsResponse ? examsResponse.data : [];
+	const allExams = examsResponse.data;
 	const sortedExams = allExams.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 	const recentExams = sortedExams.slice(0, 5);
 
