@@ -3,9 +3,9 @@ import { getClassDegree } from '@/backend_requests/degrees/getClassDegree';
 import { getExamGradeOneStudent } from '@/backend_requests/exam_grades/getExamGradeOneStudent';
 import { auth } from '@/utils/auth';
 import { ExamWithDates, ExamGrade } from '@/types/entitties';
-import { DocumentTextIcon, CalendarIcon } from '@heroicons/react/24/outline';
+import { DocumentTextIcon } from '@heroicons/react/24/outline';
 import ToDoExamCard from '@/components/StudentDashboard/ToDoExamCard';
-import UpcomingExamCard from '@/components/StudentDashboard/UpcomingExamCard';
+import Link from 'next/link';
 
 type ExamWithGrade = ExamWithDates & {
 	examGrade: ExamGrade | null;
@@ -80,50 +80,75 @@ const page = async ({ params }: { params: Promise<{ idClass: string }> }) => {
 					</p>
 				</div>
 
-				{/* Examens à faire */}
-				<div className="mb-8">
-					<div className="flex items-center justify-between mb-4">
-						<h2 className="text-2xl font-bold text-gray-900">Examens à faire</h2>
-						<span className="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">
-							{pendingExamsWithGrades.length} examen{pendingExamsWithGrades.length > 1 ? 's' : ''}
-						</span>
+				{/* Grid avec Examens à faire et Examens passés */}
+				<div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+					{/* Examens à faire */}
+					<div>
+						<div className="flex items-center justify-between mb-4">
+							<div className="flex items-center gap-2">
+								<DocumentTextIcon className="w-6 h-6 text-blue-600" />
+								<h2 className="text-xl font-bold text-gray-900">Examens à faire</h2>
+							</div>
+							<span className="bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">
+								{pendingExamsWithGrades.length} examen{pendingExamsWithGrades.length > 1 ? 's' : ''}
+							</span>
+						</div>
+
+						{pendingExamsWithGrades.length === 0 ? (
+							<div className="bg-white rounded-xl shadow-lg p-8 text-center">
+								<DocumentTextIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+								<p className="text-gray-600">Aucun examen à faire pour le moment</p>
+							</div>
+						) : (
+							<>
+								<div className="bg-white rounded-xl shadow-lg divide-y divide-gray-100">
+									{pendingExamsWithGrades.map((exam) => (
+										<ToDoExamCard key={exam.idExam} exam={exam} idStudent={idStudent} />
+									))}
+								</div>
+								<Link
+									href={`/student/${idClassNumber}/exams`}
+									className="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition-colors duration-200"
+								>
+									Voir les examens
+								</Link>
+							</>
+						)}
 					</div>
 
-					{pendingExamsWithGrades.length === 0 ? (
-						<div className="bg-white rounded-xl shadow-lg p-8 text-center">
-							<DocumentTextIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-							<p className="text-gray-600">Aucun examen à faire pour le moment</p>
+					{/* Examens passés */}
+					<div>
+						<div className="flex items-center justify-between mb-4">
+							<div className="flex items-center gap-2">
+								<DocumentTextIcon className="w-6 h-6 text-green-600" />
+								<h2 className="text-xl font-bold text-gray-900">Examens passés</h2>
+							</div>
+							<span className="bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">
+								{completedExamsWithGrades.length} examen{completedExamsWithGrades.length > 1 ? 's' : ''}
+							</span>
 						</div>
-					) : (
-						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-							{pendingExamsWithGrades.map((exam) => (
-								<ToDoExamCard key={exam.idExam} exam={exam} idClass={idClassNumber} idStudent={idStudent} />
-							))}
-						</div>
-					)}
-				</div>
 
-				{/* Examens à venir */}
-				<div className="mb-8">
-					<div className="flex items-center justify-between mb-4">
-						<h2 className="text-2xl font-bold text-gray-900">Examens à venir</h2>
-						<span className="bg-gray-100 text-gray-800 text-sm font-semibold px-3 py-1 rounded-full">
-							{commingExamsResponse.data.length} examen{commingExamsResponse.data.length > 1 ? 's' : ''}
-						</span>
+						{completedExamsWithGrades.length === 0 ? (
+							<div className="bg-white rounded-xl shadow-lg p-8 text-center">
+								<DocumentTextIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+								<p className="text-gray-600">Aucun examen passé pour le moment</p>
+							</div>
+						) : (
+							<>
+								<div className="bg-white rounded-xl shadow-lg divide-y divide-gray-100">
+									{completedExamsWithGrades.map((exam) => (
+										<ToDoExamCard key={exam.idExam} exam={exam} idStudent={idStudent} />
+									))}
+								</div>
+								<Link
+									href={`/student/${idClassNumber}/exams`}
+									className="mt-4 inline-block bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg text-center transition-colors duration-200"
+								>
+									Voir les résultats
+								</Link>
+							</>
+						)}
 					</div>
-
-					{commingExamsResponse.data.length === 0 ? (
-						<div className="bg-white rounded-xl shadow-lg p-8 text-center">
-							<CalendarIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-							<p className="text-gray-600">Aucun examen à venir</p>
-						</div>
-					) : (
-						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-							{commingExamsResponse.data.map((exam) => (
-								<UpcomingExamCard key={exam.idExam} exam={exam} />
-							))}
-						</div>
-					)}
 				</div>
 			</div>
 		</div>
