@@ -15,11 +15,11 @@ const Page = async () => {
 	const loggedUser = await auth();
 	const idTeacher = loggedUser!.user.idUser;
 	const classesResponse = await getAllClassesForOneTeacher(idTeacher);
-	const classesReponse = await getAllClassesForOneTeacher(idTeacher, 5);
-	if (!('success' in classesReponse)) {
+	if (!('success' in classesResponse)) {
 		throw new Error('Erreur lors du chargement des classes');
 	}
-	const classes = 'success' in classesResponse ? classesResponse.data : [];
+	const classes = classesResponse.data;
+	// sort classes by endDate descending
 	const sortedClasses = classes.sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime());
 	const classesWithDetails = await Promise.all(
 		sortedClasses.map(async (classe) => {

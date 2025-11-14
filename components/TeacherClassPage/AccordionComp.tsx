@@ -2,16 +2,8 @@
 import { Accordion, AccordionItem } from '@heroui/accordion';
 import Link from 'next/link';
 import { CalendarIcon, UsersIcon } from '@heroicons/react/24/outline';
-import { Class } from '@/types/entitties';
 import { ClassWithDegree } from '@/app/(protectedPages)/teacher/classes/page';
-
-const formatDate = (dateString: string) => {
-	return new Date(dateString).toLocaleDateString('fr-FR', {
-		day: 'numeric',
-		month: 'short',
-		year: 'numeric',
-	});
-};
+import formatDateWithShortMonth from '@/utils/formatDateWithShortMonth';
 
 const AccordionComp = ({ classesWithDetails }: { classesWithDetails: ClassWithDegree[] }) => {
 	const schoolYearKey = (d: Date) => {
@@ -51,11 +43,11 @@ const AccordionComp = ({ classesWithDetails }: { classesWithDetails: ClassWithDe
 											<div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
 												<div className="flex items-center gap-1">
 													<CalendarIcon className="w-4 h-4 text-indigo-500" />
-													<span>Du {formatDate(classe.startDate)}</span>
+													<span>Du {formatDateWithShortMonth(classe.startDate)}</span>
 												</div>
 												<div className="flex items-center gap-1">
 													<CalendarIcon className="w-4 h-4 text-indigo-500" />
-													<span>Au {formatDate(classe.endDate)}</span>
+													<span>Au {formatDateWithShortMonth(classe.endDate)}</span>
 												</div>
 												<div className="flex items-center gap-1">
 													<UsersIcon className="w-4 h-4 text-indigo-500" />
