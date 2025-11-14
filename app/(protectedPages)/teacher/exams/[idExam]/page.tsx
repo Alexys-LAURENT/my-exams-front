@@ -16,7 +16,7 @@ const formatDate = (dateString: string) => {
 };
 
 const Page = async ({ params }: { params: { idExam: string } }) => {
-	const idExam = parseInt(params.idExam);
+	const idExam = await parseInt(params.idExam);
 
 	const examResponse = await getOneExam(idExam);
 	if (!('success' in examResponse)) {

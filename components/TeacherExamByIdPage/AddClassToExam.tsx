@@ -69,15 +69,8 @@ const AddClassToExam = ({ idExam, existingClassIds }: { idExam: number; existing
 			return;
 		}
 
-		// Convertir au format exact attendu par VineJS: yyyy-MM-ddTHH:mm:ssZ (sans millisecondes)
-		const formatToISO = (dateStr: string): string => {
-			const isoString = new Date(dateStr + 'T00:00:00.000Z').toISOString();
-			// Retirer les millisecondes: de "2025-11-13T00:00:00.000Z" à "2025-11-13T00:00:00Z"
-			return isoString.replace(/\.\d{3}Z$/, 'Z');
-		};
-
-		const startDateISO = formatToISO(startDate);
-		const endDateISO = formatToISO(endDate);
+		const startDateISO = startDate;
+		const endDateISO = endDate;
 
 		console.log('Dates envoyées:', { start_date: startDateISO, end_date: endDateISO });
 
