@@ -1,13 +1,6 @@
 import { Exam } from '@/types/entitties';
 import { getExamClass } from '@/backend_requests/exams_classes/getExamClass';
-
-const formatDate = (dateString: string) => {
-	return new Date(dateString).toLocaleDateString('fr-FR', {
-		day: 'numeric',
-		month: 'short',
-		year: 'numeric',
-	});
-};
+import formatDateWithShortMonth from '@/utils/formatDateWithShortMonth';
 
 const ExamComp = async ({ exam, idClass }: { exam: Exam; idClass: number }) => {
 	const examDetailResponse = await getExamClass(exam.idExam, idClass);
@@ -35,7 +28,7 @@ const ExamComp = async ({ exam, idClass }: { exam: Exam; idClass: number }) => {
 				{status === 'not_started' && <span className="text-gray-600 font-bold">Pas commencé</span>}
 			</div>
 			<span className="text-sm text-gray-500">
-				{formatDate(examDetail.start_date)} - {formatDate(examDetail.end_date)}
+				{formatDateWithShortMonth(examDetail.start_date)} - {formatDateWithShortMonth(examDetail.end_date)}
 			</span>
 		</div>
 	);
