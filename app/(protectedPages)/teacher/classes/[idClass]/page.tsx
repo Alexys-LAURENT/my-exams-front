@@ -29,17 +29,6 @@ const Page = async ({ params }: { params: Promise<{ idClass: string }> }) => {
 		throw new Error('Erreur lors du chargement des examens');
 	}
 	const exams = examsResponse.data;
-	if (!classe) {
-		return (
-			<div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-				<div className="max-w-4xl mx-auto">
-					<div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
-						<p className="font-medium">Erreur lors de la récupération de la classe</p>
-					</div>
-				</div>
-			</div>
-		);
-	}
 
 	return (
 		<div className="min-h-screen p-6">
