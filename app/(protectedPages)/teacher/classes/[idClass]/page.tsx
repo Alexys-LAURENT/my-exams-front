@@ -7,29 +7,28 @@ import { getExamsOfClass } from '@/backend_requests/exams/getExamsOfClass';
 import ExamComp from '@/components/TeacherClassByIdPage/examComp';
 import formatDateWithShortMonth from '@/utils/formatDateWithShortMonth';
 
-const Page = async ({ params }: { params: { idClass: string } }) => {
-	const idClass = parseInt(params.idClass);
+const Page = async ({ params }: { params: Promise<{ idClass: string }> }) => {
+	const idClass = parseInt((await params).idClass);
 	const classResponse = await getOneClass(idClass);
 	if (!('success' in classResponse)) {
 		throw new Error('Erreur lors du chargement des classes');
 	}
-	const classe = 'success' in classResponse ? classResponse.data : null;
-	const degreeResponse = classe ? await getClassDegree(idClass) : null;
+	const classe = classResponse.data;
+	const degreeResponse = await getClassDegree(idClass);
 	if (degreeResponse && !('success' in degreeResponse)) {
 		throw new Error('Erreur lors du chargement du diplôme');
 	}
-	const degree = degreeResponse ? degreeResponse.data : null;
-	const studentsResponse = classe ? await getStudentsOfClass(idClass) : null;
+	const degree = degreeResponse.data;
+	const studentsResponse = await getStudentsOfClass(idClass);
 	if (studentsResponse && !('success' in studentsResponse)) {
 		throw new Error('Erreur lors du chargement des élèves');
 	}
-	const students = studentsResponse ? studentsResponse.data : [];
-	const examsResponse = classe ? await getExamsOfClass(idClass) : null;
+	const students = studentsResponse.data;
+	const examsResponse = await getExamsOfClass(idClass);
 	if (examsResponse && !('success' in examsResponse)) {
 		throw new Error('Erreur lors du chargement des examens');
 	}
-	const exams = examsResponse ? examsResponse.data : [];
-
+	const exams = examsResponse.data;
 	if (!classe) {
 		return (
 			<div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
