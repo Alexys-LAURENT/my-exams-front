@@ -8,16 +8,9 @@ import { putExamsForClass } from '@/backend_requests/classes/putExamsForClass';
 import { Class, Degree } from '@/types/entitties';
 import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
+import formatDateWithShortMonth from '@/utils/formatDateWithShortMonth';
 
 type ClassWithDegree = Class & { degree: Degree | null };
-
-const formatDate = (dateString: string) => {
-	return new Date(dateString).toLocaleDateString('fr-FR', {
-		day: 'numeric',
-		month: 'short',
-		year: 'numeric',
-	});
-};
 
 const AddClassToExam = ({ idExam, existingClassIds }: { idExam: number; existingClassIds: number[] }) => {
 	const dateNow = new Date();
@@ -170,7 +163,7 @@ const AddClassToExam = ({ idExam, existingClassIds }: { idExam: number; existing
 													<div className="flex-1">
 														<p className="font-medium text-gray-900">{classe.degree?.name || 'Diplôme non défini'}</p>
 														<p className="text-sm text-gray-500">
-															{formatDate(classe.startDate)} - {formatDate(classe.endDate)}
+															{formatDateWithShortMonth(classe.startDate)} - {formatDateWithShortMonth(classe.endDate)}
 														</p>
 													</div>
 												</label>

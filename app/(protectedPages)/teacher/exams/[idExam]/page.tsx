@@ -6,14 +6,7 @@ import { DocumentTextIcon, CalendarIcon, ClockIcon, ListBulletIcon } from '@hero
 import Link from 'next/link';
 import ClassComp from '@/components/TeacherExamByIdPage/ClassComp';
 import AddClassToExam from '@/components/TeacherExamByIdPage/AddClassToExam';
-
-const formatDate = (dateString: string) => {
-	return new Date(dateString).toLocaleDateString('fr-FR', {
-		day: 'numeric',
-		month: 'short',
-		year: 'numeric',
-	});
-};
+import formatDateWithShortMonth from '@/utils/formatDateWithShortMonth';
 
 const Page = async ({ params }: { params: { idExam: string } }) => {
 	const idExam = await parseInt(params.idExam);
@@ -94,7 +87,7 @@ const Page = async ({ params }: { params: { idExam: string } }) => {
 								<CalendarIcon className="w-8 h-8 text-amber-600" />
 								<div>
 									<p className="text-sm text-gray-600">Créé le</p>
-									<p className="text-lg font-semibold text-gray-900">{formatDate(exam.createdAt)}</p>
+									<p className="text-lg font-semibold text-gray-900">{formatDateWithShortMonth(exam.createdAt)}</p>
 								</div>
 							</div>
 						</div>

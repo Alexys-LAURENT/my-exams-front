@@ -1,14 +1,7 @@
 import { Class, Degree } from '@/types/entitties';
 import { AcademicCapIcon, CalendarIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-
-const formatDate = (dateString: string) => {
-	return new Date(dateString).toLocaleDateString('fr-FR', {
-		day: 'numeric',
-		month: 'short',
-		year: 'numeric',
-	});
-};
+import formatDateWithShortMonth from '@/utils/formatDateWithShortMonth';
 
 type ClassWithDegree = Class & { degree: Degree | null };
 
@@ -23,7 +16,7 @@ const ClassComp = ({ classe, idExam }: { classe: ClassWithDegree; idExam: number
 						<div className="flex items-center gap-2 text-sm text-gray-500">
 							<CalendarIcon className="w-4 h-4" />
 							<span>
-								{formatDate(classe.startDate)} - {formatDate(classe.endDate)}
+								{formatDateWithShortMonth(classe.startDate)} - {formatDateWithShortMonth(classe.endDate)}
 							</span>
 						</div>
 					</div>
