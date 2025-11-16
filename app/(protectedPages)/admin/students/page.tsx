@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { User } from '@/types/entitties';
 import { getAllStudents } from '@/backend_requests/students/getAllStudents';
 import { createStudent } from '@/backend_requests/students/createStudent';
@@ -12,6 +13,7 @@ import { DeleteEntityModal } from '@/components/AdminPage/DeleteEntityModal';
 import { Input } from '@heroui/input';
 
 const Page = () => {
+	const router = useRouter();
 	const [students, setStudents] = useState<User[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -232,8 +234,8 @@ const Page = () => {
 							</thead>
 							<tbody className="bg-white divide-y divide-gray-200">
 								{filteredStudents.map((student) => (
-									<tr key={student.idUser} className="hover:bg-gray-50">
-										<td className="px-6 py-4 whitespace-nowrap">
+									<tr key={student.idUser} className="hover:bg-gray-50 transition-colors">
+										<td className="px-6 py-4 whitespace-nowrap cursor-pointer" onClick={() => router.push(`/admin/students/${student.idUser}`)}>
 											<div className="flex items-center gap-3">
 												{student.avatarPath ? (
 													<img src={student.avatarPath} alt={`${student.name} ${student.lastName}`} className="w-10 h-10 rounded-full object-cover" />
@@ -251,13 +253,27 @@ const Page = () => {
 												</div>
 											</div>
 										</td>
-										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{student.email}</td>
+										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 cursor-pointer" onClick={() => router.push(`/admin/students/${student.idUser}`)}>
+											{student.email}
+										</td>
 										<td className="px-6 py-4 whitespace-nowrap text-sm text-right">
 											<div className="flex items-center justify-end gap-2">
-												<button onClick={() => openEditModal(student)} className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors font-medium">
+												<button
+													onClick={(e) => {
+														e.stopPropagation();
+														openEditModal(student);
+													}}
+													className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors font-medium"
+												>
 													Modifier
 												</button>
-												<button onClick={() => openDeleteModal(student)} className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors font-medium">
+												<button
+													onClick={(e) => {
+														e.stopPropagation();
+														openDeleteModal(student);
+													}}
+													className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors font-medium"
+												>
 													Supprimer
 												</button>
 											</div>
