@@ -1,10 +1,10 @@
-import { getExamsOfClass } from '@/backend_requests/exams/getExamsOfClass';
 import { getClassDegree } from '@/backend_requests/degrees/getClassDegree';
 import { getExamGradeOneStudent } from '@/backend_requests/exam_grades/getExamGradeOneStudent';
-import { auth } from '@/utils/auth';
-import { ExamWithDates, ExamGrade } from '@/types/entitties';
-import { DocumentTextIcon } from '@heroicons/react/24/outline';
+import { getExamsOfClass } from '@/backend_requests/exams/getExamsOfClass';
 import ToDoExamCard from '@/components/StudentDashboard/ToDoExamCard';
+import { ExamGrade, ExamWithDates } from '@/types/entitties';
+import { auth } from '@/utils/auth';
+import { DocumentTextIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
 type ExamWithGrade = ExamWithDates & {
@@ -17,7 +17,7 @@ const page = async ({ params }: { params: Promise<{ idClass: string }> }) => {
 
 	// Récupérer l'utilisateur connecté (garanti par le middleware)
 	const session = await auth();
-	const idStudent = session!.user!.idUser
+	const idStudent = session!.user!.idUser;
 
 	// Récupérer les données en parallèle avec limit = 5
 	const [pendingExamsResponse, completedExamsResponse, commingExamsResponse, degreeResponse] = await Promise.all([
@@ -28,14 +28,9 @@ const page = async ({ params }: { params: Promise<{ idClass: string }> }) => {
 	]);
 
 	// Vérification des erreurs - NextJs redirigera vers la page d'erreur par défaut
-	if (
-		!('success' in pendingExamsResponse) ||
-		!('success' in completedExamsResponse) ||
-		!('success' in commingExamsResponse) ||
-		!('success' in degreeResponse)
-	) {
+	if (!('success' in pendingExamsResponse) || !('success' in completedExamsResponse) || !('success' in commingExamsResponse) || !('success' in degreeResponse)) {
 		throw new Error('Erreur lors de la récupération des données du dashboard');
-	}	
+	}
 
 	// Récupérer les examGrade pour chaque examen
 	const pendingExamsWithGrades: ExamWithGrade[] = await Promise.all(
@@ -60,15 +55,12 @@ const page = async ({ params }: { params: Promise<{ idClass: string }> }) => {
 
 	const degreeName = degreeResponse.data.name;
 
-
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+		<div className="min-h-screen p-6">
 			<div className="max-w-7xl mx-auto">
 				{/* Header */}
 				<div className="mb-8">
-					<h1 className="text-4xl font-bold text-gray-900 mb-2">
-						Bonjour {session!.user.name}
-					</h1>
+					<h1 className="text-4xl font-bold text-gray-900 mb-2">Bonjour {session!.user.name}</h1>
 					<p className="text-gray-600">Voici un aperçu de vos examens et résultats - {degreeName}</p>
 					<p className="text-sm text-gray-500 mt-1">
 						Aujourd&apos;hui{' '}
@@ -103,7 +95,7 @@ const page = async ({ params }: { params: Promise<{ idClass: string }> }) => {
 							<>
 								<div className="bg-white rounded-xl shadow-lg divide-y divide-gray-100">
 									{pendingExamsWithGrades.map((exam) => (
-										<ToDoExamCard key={exam.idExam} exam={exam} idStudent={idStudent} />
+										<ToDoExamCard key={exam.idExam} idClass={idClassNumber} exam={exam} idStudent={idStudent} />
 									))}
 								</div>
 								<Link
@@ -137,7 +129,7 @@ const page = async ({ params }: { params: Promise<{ idClass: string }> }) => {
 							<>
 								<div className="bg-white rounded-xl shadow-lg divide-y divide-gray-100">
 									{completedExamsWithGrades.map((exam) => (
-										<ToDoExamCard key={exam.idExam} exam={exam} idStudent={idStudent} />
+										<ToDoExamCard key={exam.idExam} idClass={idClassNumber} exam={exam} idStudent={idStudent} />
 									))}
 								</div>
 								<Link

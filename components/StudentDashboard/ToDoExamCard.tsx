@@ -1,4 +1,4 @@
-import { ExamWithDates, ExamGrade } from '@/types/entitties';
+import { ExamGrade, ExamWithDates } from '@/types/entitties';
 import { DocumentTextIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
@@ -7,6 +7,7 @@ type ExamWithGrade = ExamWithDates & {
 };
 
 type ToDoExamCardProps = {
+	idClass: number;
 	exam: ExamWithGrade;
 	idStudent: number;
 };
@@ -19,12 +20,9 @@ const formatDate = (dateString: string) => {
 	});
 };
 
-const ToDoExamCard = ({ exam, idStudent }: ToDoExamCardProps) => {
+const ToDoExamCard = ({ idClass, exam, idStudent }: ToDoExamCardProps) => {
 	return (
-		<Link
-			href={`/student/${idStudent}/${exam.idExam}`}
-			className="bg-white rounded-lg p-4 flex items-center justify-between hover:bg-gray-50 transition-colors duration-200"
-		>
+		<Link href={`/student/${idClass}/${idStudent}/${exam.idExam}`} className="bg-white rounded-lg p-4 flex items-center justify-between hover:bg-gray-50 transition-colors duration-200">
 			<div className="flex items-center gap-4 flex-1">
 				{/* Icône */}
 				<div className="bg-blue-100 p-3 rounded-lg flex-shrink-0">
