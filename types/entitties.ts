@@ -33,6 +33,10 @@ export type Degree = {
 	updatedAt: string | null;
 };
 
+export type ClassWithDegree = Class & {
+	degree: Degree;
+};
+
 export type Exam = {
 	idExam: number;
 	title: string;
