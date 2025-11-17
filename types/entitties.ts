@@ -21,6 +21,7 @@ export type Meta = {
 
 export type Class = {
 	idClass: number;
+	name: string;
 	startDate: string;
 	endDate: string;
 	idDegree: number;
