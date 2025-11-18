@@ -98,7 +98,9 @@ const page = async () => {
 										{/* Titre du diplôme */}
 										<div className="flex items-start justify-between mb-4">
 											<div className="flex-1">
-												<h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">{classe.degree ? classe.degree.name : 'Diplôme non disponible'}</h3>
+												<h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+													{classe.degree ? classe.degree.name : 'Diplôme non disponible'} {classe.name}
+												</h3>
 												<span
 													className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
 														isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
@@ -124,11 +126,6 @@ const page = async () => {
 												<ClockIcon className="w-4 h-4 mr-2 flex-shrink-0" />
 												<span className="text-sm font-medium">Durée: {duration}</span>
 											</div>
-										</div>
-
-										{/* Footer avec ID de classe */}
-										<div className="mt-4 pt-4 border-t border-gray-100">
-											<p className="text-xs text-gray-500">Classe #{classe.idClass}</p>
 										</div>
 									</div>
 								</Link>
