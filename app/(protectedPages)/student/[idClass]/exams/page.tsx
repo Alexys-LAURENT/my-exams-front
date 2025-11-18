@@ -1,8 +1,8 @@
-import { getExamsOfClass } from '@/backend_requests/exams/getExamsOfClass';
 import { getExamGradeOneStudent } from '@/backend_requests/exam_grades/getExamGradeOneStudent';
-import { auth } from '@/utils/auth';
-import { ExamWithDates, ExamGrade } from '@/types/entitties';
+import { getExamsOfClass } from '@/backend_requests/exams/getExamsOfClass';
 import ExamsList from '@/components/StudentExams/ExamsList';
+import { ExamGrade, ExamWithDates } from '@/types/entitties';
+import { auth } from '@/utils/auth';
 
 type ExamWithGrade = ExamWithDates & {
 	examGrade: ExamGrade | null;
@@ -12,7 +12,6 @@ const page = async ({ params }: { params: Promise<{ idClass: string }> }) => {
 	const { idClass } = await params;
 	const idClassNumber = parseInt(idClass);
 
-	
 	const session = await auth();
 	const idStudent = session!.user!.idUser;
 
@@ -46,13 +45,9 @@ const page = async ({ params }: { params: Promise<{ idClass: string }> }) => {
 	});
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+		<div className="min-h-screen p-6">
 			<div className="max-w-7xl mx-auto">
-				<ExamsList
-					pendingExams={pendingExamsWithGrades}
-					completedExams={completedExamsWithGrades}
-					idStudent={idStudent}
-				/>
+				<ExamsList pendingExams={pendingExamsWithGrades} completedExams={completedExamsWithGrades} idStudent={idStudent} />
 			</div>
 		</div>
 	);
