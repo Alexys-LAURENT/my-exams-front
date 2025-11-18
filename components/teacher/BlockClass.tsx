@@ -1,9 +1,8 @@
 'use client';
-import Link from 'next/link';
-import { AcademicCapIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
-import React from 'react';
 import { ClassWithDegree } from '@/app/(protectedPages)/teacher/dashboard/page';
 import formatDate from '@/utils/formatDateWithShortMonth';
+import { AcademicCapIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
 
 const BlockClass = ({ classesWithDegrees }: { classesWithDegrees: ClassWithDegree[] }) => {
 	return (
@@ -25,7 +24,7 @@ const BlockClass = ({ classesWithDegrees }: { classesWithDegrees: ClassWithDegre
 					</div>
 				) : (
 					<div className="space-y-3">
-						{classesWithDegrees.map((classe, index) => (
+						{classesWithDegrees.map((classe) => (
 							<Link
 								key={classe.idClass}
 								href={`/teacher/classes/${classe.idClass}`}
@@ -33,7 +32,7 @@ const BlockClass = ({ classesWithDegrees }: { classesWithDegrees: ClassWithDegre
 							>
 								<div className="flex items-center justify-between">
 									<div className="flex-1">
-										<p className="text-gray-900 font-medium group-hover:text-indigo-700 transition-colors">{classe.degree ? classe.degree.name : `Classe ${index + 1}`}</p>
+										<p className="text-gray-900 font-medium group-hover:text-indigo-700 transition-colors">{`${classe.name} ${classe.degree.name}`}</p>
 										<p className="text-xs text-gray-500 mt-1">
 											Du {formatDate(classe.startDate)}, jusqu&apos;au {formatDate(classe.endDate)}
 										</p>

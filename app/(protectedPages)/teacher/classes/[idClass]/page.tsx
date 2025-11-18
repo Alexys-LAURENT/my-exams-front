@@ -1,11 +1,11 @@
 import { getOneClass } from '@/backend_requests/classes/getOneClass';
 import { getClassDegree } from '@/backend_requests/degrees/getClassDegree';
-import { getStudentsOfClass } from '@/backend_requests/students/getStudentsOfClass';
-import { AcademicCapIcon, CalendarIcon, UsersIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
-import Link from 'next/link';
 import { getExamsOfClass } from '@/backend_requests/exams/getExamsOfClass';
+import { getStudentsOfClass } from '@/backend_requests/students/getStudentsOfClass';
 import ExamComp from '@/components/TeacherClassByIdPage/examComp';
 import formatDateWithShortMonth from '@/utils/formatDateWithShortMonth';
+import { AcademicCapIcon, CalendarIcon, DocumentTextIcon, UsersIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
 
 const Page = async ({ params }: { params: Promise<{ idClass: string }> }) => {
 	const idClass = parseInt((await params).idClass);
@@ -42,8 +42,8 @@ const Page = async ({ params }: { params: Promise<{ idClass: string }> }) => {
 							<div className="bg-white p-4 rounded-lg shadow-sm flex items-center gap-3">
 								<AcademicCapIcon className="w-8 h-8 text-indigo-600" />
 								<div>
-									<p className="text-sm text-gray-600">Diplôme</p>
-									<p className="text-lg font-semibold text-gray-900">{degree?.name || 'Non défini'}</p>
+									<p className="text-sm text-gray-600">Classe</p>
+									<p className="text-lg font-semibold text-gray-900">{`${classe.name} ${degree.name}`}</p>
 								</div>
 							</div>
 

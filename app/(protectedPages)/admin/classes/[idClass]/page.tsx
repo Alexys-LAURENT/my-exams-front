@@ -1,7 +1,7 @@
 import { getOneClass } from '@/backend_requests/classes/getOneClass';
 import { getClassDegree } from '@/backend_requests/degrees/getClassDegree';
 import { getClassGeneralAverage } from '@/backend_requests/stats/getClassGeneralAverage';
-import { getUserAverageInClass } from '@/backend_requests/stats/getUserAverageInClass';
+import { getUserGeneralAverageInClass } from '@/backend_requests/stats/getUserGeneralAverageInClass';
 import { getStudentsOfClass } from '@/backend_requests/students/getStudentsOfClass';
 import { ClassActions } from '@/components/AdminClassPage/ClassActions';
 import { RemoveStudentButton } from '@/components/AdminClassPage/RemoveStudentButton';
@@ -47,7 +47,7 @@ const Page = async ({ params }: PageProps) => {
 	// Récupérer les moyennes pour chaque étudiant
 	const studentsWithAverages = await Promise.all(
 		students.map(async (student) => {
-			const averageResponse = await getUserAverageInClass(idClassNumber, student.idUser);
+			const averageResponse = await getUserGeneralAverageInClass(idClassNumber, student.idUser);
 			const studentAverage = 'success' in averageResponse && averageResponse.success ? averageResponse.data.average : null;
 
 			return {

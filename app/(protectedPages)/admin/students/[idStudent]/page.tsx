@@ -1,6 +1,6 @@
 import { getStudentClasses } from '@/backend_requests/classes/getStudentClasses';
 import { getClassDegree } from '@/backend_requests/degrees/getClassDegree';
-import { getUserAverageInClass } from '@/backend_requests/stats/getUserAverageInClass';
+import { getUserGeneralAverageInClass } from '@/backend_requests/stats/getUserGeneralAverageInClass';
 import { getAllStudents } from '@/backend_requests/students/getAllStudents';
 import { RemoveStudentFromClassButton, StudentActions } from '@/components/AdminStudentPage';
 import { Avatar } from '@heroui/avatar';
@@ -39,7 +39,7 @@ const Page = async ({ params }: PageProps) => {
 	const classesWithDetails = await Promise.all(
 		classes.map(async (classe) => {
 			const degreeResponse = await getClassDegree(classe.idClass);
-			const averageResponse = await getUserAverageInClass(classe.idClass, idStudentNumber);
+			const averageResponse = await getUserGeneralAverageInClass(classe.idClass, idStudentNumber);
 
 			if (!('success' in degreeResponse) || !degreeResponse.success) {
 				throw new Error(`Impossible de récupérer le diplôme pour la classe ${classe.name}`);

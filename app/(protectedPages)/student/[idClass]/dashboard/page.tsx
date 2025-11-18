@@ -1,6 +1,6 @@
 import { getOneClass } from '@/backend_requests/classes/getOneClass';
 import { getClassDegree } from '@/backend_requests/degrees/getClassDegree';
-import { getUserAverageInClass } from '@/backend_requests/stats/getUserAverageInClass';
+import { getUserGeneralAverageInClass } from '@/backend_requests/stats/getUserGeneralAverageInClass';
 import CompletedExamsList from '@/components/StudentDashboard/CompletedExamsList';
 import LatestExamGrades from '@/components/StudentDashboard/LatestExamGrades';
 import PendingExamsList from '@/components/StudentDashboard/PendingExamsList';
@@ -17,7 +17,7 @@ const page = async ({ params }: { params: Promise<{ idClass: string }> }) => {
 	const idStudent = session!.user!.idUser;
 
 	// Récupérer les données de base en parallèle
-	const [classReponse, degreeResponse, averageResponse] = await Promise.all([getOneClass(idClassNumber), getClassDegree(idClassNumber), getUserAverageInClass(idClassNumber, idStudent)]);
+	const [classReponse, degreeResponse, averageResponse] = await Promise.all([getOneClass(idClassNumber), getClassDegree(idClassNumber), getUserGeneralAverageInClass(idClassNumber, idStudent)]);
 
 	// Vérification des erreurs - NextJs redirigera vers la page d'erreur par défaut
 	if (!('success' in classReponse) || !('success' in degreeResponse) || !('success' in averageResponse)) {

@@ -14,8 +14,6 @@ export type UserAverageInClassResponse = {
  * @param idUser - L'identifiant de l'élève
  * @returns La moyenne de l'élève dans cette classe
  */
-export const getUserAverageInClass = async (idClass: number, idUser: number) => {
-	return (await fetchApi(`/api/stats/classes/${idClass}/users/${idUser}/average`)) as
-		| ApiError
-		| SuccessResponse<UserAverageInClassResponse>;
+export const getUserGeneralAverageInClass = async (idClass: number, idUser: number) => {
+	return (await fetchApi(`/api/stats/classes/${idClass}/users/${idUser}/average`)) as ApiError | SuccessResponse<UserAverageInClassResponse>;
 };

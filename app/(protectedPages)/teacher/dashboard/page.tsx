@@ -1,14 +1,14 @@
 import { getAllClassesForOneTeacher } from '@/backend_requests/classes/getAllClassesForOneTeacher';
 import { getClassDegree } from '@/backend_requests/degrees/getClassDegree';
 import { getAllExamsForOneTeacher } from '@/backend_requests/exams/getAllExamsForOneTeacher';
-import { auth } from '@/utils/auth';
 import BlockClass from '@/components/teacher/BlockClass';
-import { Class, Degree } from '@/types/entitties';
 import BlockCreateExam from '@/components/teacher/BlockCreateExam';
 import BlockExam from '@/components/teacher/BlockExam';
+import { Class, Degree } from '@/types/entitties';
+import { auth } from '@/utils/auth';
 
 export type ClassWithDegree = Class & {
-	degree: Degree | null;
+	degree: Degree;
 };
 
 const Page = async () => {
@@ -30,9 +30,14 @@ const Page = async () => {
 	const classesWithDegrees = await Promise.all(
 		classes.map(async (classe) => {
 			const degree = await getClassDegree(classe.idClass);
+
+			if (!('success' in degree)) {
+				throw new Error('Erreur lors de la récupération des degrees');
+			}
+
 			return {
 				...classe,
-				degree: 'success' in degree ? degree.data : null,
+				degree: degree.data,
 			};
 		})
 	);

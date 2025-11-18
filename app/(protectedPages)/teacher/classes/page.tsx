@@ -1,13 +1,13 @@
 import { getAllClassesForOneTeacher } from '@/backend_requests/classes/getAllClassesForOneTeacher';
-import { auth } from '@/utils/auth';
-import { AcademicCapIcon } from '@heroicons/react/24/outline';
 import { getClassDegree } from '@/backend_requests/degrees/getClassDegree';
 import { getStudentsOfClass } from '@/backend_requests/students/getStudentsOfClass';
-import { Class, Degree } from '@/types/entitties';
 import FilterByDeegree from '@/components/TeacherClassPage/FilterByDeegree';
+import { Class, Degree } from '@/types/entitties';
+import { auth } from '@/utils/auth';
+import { AcademicCapIcon } from '@heroicons/react/24/outline';
 
 export type ClassWithDegree = Class & {
-	degree: Degree | null;
+	degree: Degree;
 	studentsCount: number;
 };
 
@@ -25,10 +25,15 @@ const Page = async () => {
 		sortedClasses.map(async (classe) => {
 			const degreeResponse = await getClassDegree(classe.idClass);
 			const studentsResponse = await getStudentsOfClass(classe.idClass);
+
+			if (!('success' in degreeResponse) || !('success' in studentsResponse)) {
+				throw new Error('Erreur lors de la récupération des détails de la classe');
+			}
+
 			return {
 				...classe,
-				degree: 'success' in degreeResponse ? degreeResponse.data : null,
-				studentsCount: 'success' in studentsResponse ? studentsResponse.data.length : 0,
+				degree: degreeResponse.data,
+				studentsCount: studentsResponse.data.length,
 			};
 		})
 	);

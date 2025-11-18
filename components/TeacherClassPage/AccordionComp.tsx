@@ -1,9 +1,9 @@
 'use client';
-import { Accordion, AccordionItem } from '@heroui/accordion';
-import Link from 'next/link';
-import { CalendarIcon, UsersIcon } from '@heroicons/react/24/outline';
 import { ClassWithDegree } from '@/app/(protectedPages)/teacher/classes/page';
 import formatDateWithShortMonth from '@/utils/formatDateWithShortMonth';
+import { CalendarIcon, UsersIcon } from '@heroicons/react/24/outline';
+import { Accordion, AccordionItem } from '@heroui/accordion';
+import Link from 'next/link';
 
 const AccordionComp = ({ classesWithDetails }: { classesWithDetails: ClassWithDegree[] }) => {
 	const schoolYearKey = (d: Date) => {
@@ -35,9 +35,7 @@ const AccordionComp = ({ classesWithDetails }: { classesWithDetails: ClassWithDe
 									<div className="flex items-center justify-between gap-4">
 										<div className="flex-1 min-w-0">
 											<div className="mb-2">
-												<h3 className="text-lg font-bold text-gray-900 group-hover:text-indigo-700 transition-colors truncate">
-													{classe.degree ? classe.degree.name : `Classe ${classe.idClass}`}
-												</h3>
+												<h3 className="text-lg font-bold text-gray-900 group-hover:text-indigo-700 transition-colors truncate">{`${classe.name} ${classe.degree.name}`}</h3>
 											</div>
 
 											<div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
