@@ -1,9 +1,11 @@
 import { getOneClass } from '@/backend_requests/classes/getOneClass';
 import { getClassDegree } from '@/backend_requests/degrees/getClassDegree';
 import { getClassGeneralAverage } from '@/backend_requests/stats/getClassGeneralAverage';
+import { getUserAverageInClass } from '@/backend_requests/stats/getUserAverageInClass';
 import { getStudentsOfClass } from '@/backend_requests/students/getStudentsOfClass';
 import { ClassActions } from '@/components/AdminClassPage/ClassActions';
 import { RemoveStudentButton } from '@/components/AdminClassPage/RemoveStudentButton';
+import { Avatar } from '@heroui/avatar';
 import Link from 'next/link';
 
 interface PageProps {
@@ -41,6 +43,19 @@ const Page = async ({ params }: PageProps) => {
 	const students = studentsResponse.data;
 	const average = averageResponse.data.average;
 	const degree = degreeResponse.data;
+
+	// Récupérer les moyennes pour chaque étudiant
+	const studentsWithAverages = await Promise.all(
+		students.map(async (student) => {
+			const averageResponse = await getUserAverageInClass(idClassNumber, student.idUser);
+			const studentAverage = 'success' in averageResponse && averageResponse.success ? averageResponse.data.average : null;
+
+			return {
+				...student,
+				average: studentAverage,
+			};
+		})
+	);
 
 	const formatDate = (dateString: string) => {
 		return new Date(dateString).toLocaleDateString('fr-FR', {
@@ -118,18 +133,38 @@ const Page = async ({ params }: PageProps) => {
 							<table className="w-full">
 								<thead>
 									<tr className="border-b border-gray-200">
+										<th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Avatar</th>
 										<th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Nom</th>
 										<th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Prénom</th>
 										<th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Email</th>
+										<th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Moyenne</th>
 										<th className="text-right py-3 px-4 text-sm font-semibold text-gray-600">Actions</th>
 									</tr>
 								</thead>
 								<tbody>
-									{students.map((student) => (
+									{studentsWithAverages.map((student) => (
 										<tr key={student.idUser} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-											<td className="py-4 px-4 text-sm text-gray-900">{student.lastName}</td>
-											<td className="py-4 px-4 text-sm text-gray-900">{student.name}</td>
+											<td className="py-4 px-4">
+												<Avatar src={student.avatarPath || undefined} name={student.name} size="sm" className="shrink-0" />
+											</td>
+											<td className="py-4 px-4 text-sm text-gray-900">
+												<Link href={`/admin/students/${student.idUser}`} className="hover:text-blue-600 transition-colors">
+													{student.lastName}
+												</Link>
+											</td>
+											<td className="py-4 px-4 text-sm text-gray-900">
+												<Link href={`/admin/students/${student.idUser}`} className="hover:text-blue-600 transition-colors">
+													{student.name}
+												</Link>
+											</td>
 											<td className="py-4 px-4 text-sm text-gray-600">{student.email}</td>
+											<td className="py-4 px-4 text-sm font-semibold text-gray-900">
+												{student.average !== null ? (
+													<span className={student.average >= 10 ? 'text-green-600' : 'text-red-600'}>{student.average.toFixed(2)}/20</span>
+												) : (
+													<span className="text-gray-400">N/A</span>
+												)}
+											</td>
 											<td className="py-4 px-4 text-right">
 												<RemoveStudentButton idClass={idClassNumber} idStudent={student.idUser} studentName={`${student.name} ${student.lastName}`} />
 											</td>

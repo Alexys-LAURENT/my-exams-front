@@ -18,7 +18,7 @@ export const ClassCard = ({ classe, degreeName }: ClassCardProps) => {
 	const formatDate = (dateString: string) => {
 		return new Date(dateString).toLocaleDateString('fr-FR', {
 			day: '2-digit',
-			month: 'long',
+			month: 'short',
 			year: 'numeric',
 		});
 	};
@@ -46,25 +46,30 @@ export const ClassCard = ({ classe, degreeName }: ClassCardProps) => {
 	};
 
 	return (
-		<div className="p-6 w-full rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
-			<div className="flex justify-between items-start">
-				<div className="flex gap-2 justify-center items-center ">
-					<span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 w-fit">{degreeName}</span>
-					<h3 className="text-xl font-bold text-gray-900">{classe.name}</h3>
+		<div className="bg-white rounded-lg border border-gray-200 p-6 ">
+			<div className="flex justify-between items-start mb-4">
+				<div className="flex flex-col gap-2">
+					<div className="flex items-center gap-3">
+						<h3 className="text-xl font-bold text-gray-900">{classe.name}</h3>
+						<span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">{degreeName}</span>
+					</div>
+					<div className="flex items-center gap-2 text-sm text-gray-600">
+						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+						</svg>
+						<span className="font-medium text-gray-700">{formatDate(classe.startDate)}</span>
+						<span className="text-gray-400">→</span>
+						<span className="font-medium text-gray-700">{formatDate(classe.endDate)}</span>
+					</div>
 				</div>
 				<div className="flex gap-2">
-					<Button onPress={handleViewDetails} size="sm" className="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors duration-200">
+					<Button onPress={handleViewDetails} size="sm" color="primary" variant="flat" className="font-medium">
 						Voir les détails
 					</Button>
-					<Button onPress={handleDelete} size="sm" color="danger" variant="light" className="px-4 py-2 text-sm font-medium">
+					<Button onPress={handleDelete} size="sm" color="danger" variant="flat" className="font-medium">
 						Supprimer
 					</Button>
 				</div>
-			</div>
-			<div className="">
-				<span className="text-gray-700 text-sm">
-					Du <span className="font-medium text-gray-900">{formatDate(classe.startDate)}</span> au <span className="font-medium text-gray-900">{formatDate(classe.endDate)}</span>
-				</span>
 			</div>
 		</div>
 	);

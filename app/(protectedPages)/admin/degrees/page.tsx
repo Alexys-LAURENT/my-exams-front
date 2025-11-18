@@ -1,13 +1,26 @@
 import { getAllDegrees } from '@/backend_requests/degrees/getAllDegrees';
 import { CreateDegreeButton, DeleteDegreeButton, EditDegreeButton } from '@/components/AdminDegreePage';
+import { SearchFilter } from '@/components/AdminPage/SearchFilter';
 
-const Page = async () => {
+interface PageProps {
+	searchParams: Promise<{ search?: string }>;
+}
+
+const Page = async ({ searchParams }: PageProps) => {
+	const { search } = await searchParams;
+
 	const degreesResponse = await getAllDegrees();
 	if (!('success' in degreesResponse) || !degreesResponse.success) {
 		throw new Error('Impossible de récupérer les diplômes');
 	}
 
-	const degrees = degreesResponse.data;
+	let degrees = degreesResponse.data;
+
+	// Filtrer les diplômes si un terme de recherche est présent
+	if (search) {
+		const searchLower = search.toLowerCase();
+		degrees = degrees.filter((degree) => degree.name.toLowerCase().includes(searchLower));
+	}
 
 	const formatDate = (dateString: string) => {
 		return new Date(dateString).toLocaleDateString('fr-FR', {
@@ -27,13 +40,14 @@ const Page = async () => {
 			</div>
 
 			<div className="bg-white rounded-lg border border-gray-200">
-				<div className="px-6 py-4 border-b border-gray-200">
+				<div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
 					<h2 className="text-xl font-bold text-gray-900">Liste des diplômes ({degrees.length})</h2>
+					<SearchFilter placeholder="Rechercher un diplôme..." />
 				</div>
 				<div className="p-6">
 					{degrees.length === 0 ? (
 						<div className="text-center py-12">
-							<p className="text-gray-500">Aucun diplôme disponible</p>
+							<p className="text-gray-500">{search ? 'Aucun diplôme trouvé pour cette recherche' : 'Aucun diplôme disponible'}</p>
 						</div>
 					) : (
 						<div className="overflow-x-auto">

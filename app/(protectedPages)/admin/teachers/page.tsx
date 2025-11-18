@@ -1,15 +1,30 @@
 import { getAllTeachers } from '@/backend_requests/teachers/getAllTeachers';
+import { SearchFilter } from '@/components/AdminPage/SearchFilter';
 import { CreateTeacherButton, DeleteTeacherButton } from '@/components/AdminTeacherPage';
 import { Avatar } from '@heroui/avatar';
 import Link from 'next/link';
 
-const Page = async () => {
+interface PageProps {
+	searchParams: Promise<{ search?: string }>;
+}
+
+const Page = async ({ searchParams }: PageProps) => {
+	const { search } = await searchParams;
+
 	const teachersResponse = await getAllTeachers();
 	if (!('success' in teachersResponse) || !teachersResponse.success) {
 		throw new Error('Impossible de récupérer les enseignants');
 	}
 
-	const teachers = teachersResponse.data;
+	let teachers = teachersResponse.data;
+
+	// Filtrer les enseignants si un terme de recherche est présent
+	if (search) {
+		const searchLower = search.toLowerCase();
+		teachers = teachers.filter(
+			(teacher) => teacher.name.toLowerCase().includes(searchLower) || teacher.lastName.toLowerCase().includes(searchLower) || teacher.email.toLowerCase().includes(searchLower)
+		);
+	}
 
 	return (
 		<div className="flex flex-col w-full gap-6 p-6">
@@ -19,13 +34,14 @@ const Page = async () => {
 			</div>
 
 			<div className="bg-white rounded-lg border border-gray-200">
-				<div className="px-6 py-4 border-b border-gray-200">
+				<div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
 					<h2 className="text-xl font-bold text-gray-900">Liste des enseignants ({teachers.length})</h2>
+					<SearchFilter placeholder="Rechercher un enseignant..." />
 				</div>
 				<div className="p-6">
 					{teachers.length === 0 ? (
 						<div className="text-center py-12">
-							<p className="text-gray-500">Aucun enseignant disponible</p>
+							<p className="text-gray-500">{search ? 'Aucun enseignant trouvé pour cette recherche' : 'Aucun enseignant disponible'}</p>
 						</div>
 					) : (
 						<div className="overflow-x-auto">

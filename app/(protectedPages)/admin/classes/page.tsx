@@ -2,11 +2,16 @@ import { getAllClasses } from '@/backend_requests/classes/getAllClasses';
 import { getClassDegree } from '@/backend_requests/degrees/getClassDegree';
 import { ClassesAccordion } from '@/components/AdminClassPage/ClassesAccordion';
 import ModalCreateClassButton from '@/components/AdminClassPage/ModalCreateClassButton';
+import { SearchFilter } from '@/components/AdminPage/SearchFilter';
 import { SCHOOL_YEAR_START_MONTH } from '@/constants/schoolYears';
 import { Class } from '@/types/entitties';
 
 interface ClassWithDegree extends Class {
 	degreeName: string;
+}
+
+interface PageProps {
+	searchParams: Promise<{ search?: string }>;
 }
 
 // Fonction pour grouper les classes par année scolaire
@@ -35,7 +40,9 @@ const getCurrentSchoolYear = () => {
 	return `${year}-${year + 1}`;
 };
 
-const Page = async () => {
+const Page = async ({ searchParams }: PageProps) => {
+	const { search } = await searchParams;
+
 	const classesReponse = await getAllClasses();
 	if (!('success' in classesReponse)) {
 		throw new Error('Erreur lors de la récupération des classes');
@@ -57,7 +64,14 @@ const Page = async () => {
 		})
 	);
 
-	const groupedClasses = groupClassesBySchoolYear(classesWithDegrees);
+	// Filtrer les classes par recherche
+	let filteredClasses = classesWithDegrees;
+	if (search) {
+		const searchLower = search.toLowerCase();
+		filteredClasses = filteredClasses.filter((classe) => classe.name.toLowerCase().includes(searchLower) || classe.degreeName.toLowerCase().includes(searchLower));
+	}
+
+	const groupedClasses = groupClassesBySchoolYear(filteredClasses);
 	const currentSchoolYear = getCurrentSchoolYear();
 
 	return (
@@ -67,9 +81,13 @@ const Page = async () => {
 				<ModalCreateClassButton />
 			</div>
 
-			{classesWithDegrees.length === 0 ? (
+			<div className="bg-white rounded-lg border border-gray-200 p-4">
+				<SearchFilter placeholder="Rechercher une classe..." />
+			</div>
+
+			{filteredClasses.length === 0 ? (
 				<div className="flex justify-center items-center h-64">
-					<p className="text-xl text-gray-500">Aucune classe disponible.</p>
+					<p className="text-xl text-gray-500">{search ? 'Aucune classe trouvée pour cette recherche' : 'Aucune classe disponible.'}</p>
 				</div>
 			) : (
 				<ClassesAccordion groupedClasses={groupedClasses} currentSchoolYear={currentSchoolYear} />

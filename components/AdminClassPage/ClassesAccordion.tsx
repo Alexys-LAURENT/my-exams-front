@@ -30,7 +30,7 @@ export const ClassesAccordion = ({ groupedClasses, currentSchoolYear }: ClassesA
 					}
 					classNames={{ base: 'shadow-none border border-black/10', trigger: 'cursor-pointer' }}
 				>
-					<div className="flex flex-col gap-4">
+					<div className="flex flex-col gap-4 mb-4">
 						{classes.map((classe) => (
 							<ClassCard key={classe.idClass} classe={classe} degreeName={classe.degreeName} />
 						))}
