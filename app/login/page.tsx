@@ -31,13 +31,15 @@ const Page = () => {
 					<div className="bg-blue-600 p-4 rounded-md mb-3">
 						<AcademicCapIcon className="w-8 h-8 text-white" />
 					</div>
-					<h1 className="text-3xl font-bold">ExamPro</h1>
+					<h1 className="text-3xl font-bold">My Exams</h1>
 				</div>
 				<div className="bg-white w-full p-8 rounded-lg shadow-md">
 					<h2 className="text-xl font-medium text-center mb-8">Connexion</h2>
 					<form onSubmit={handlesubmit} className="flex flex-col gap-5 w-full">
 						<div className="flex flex-col gap-2">
-							<label htmlFor="email" className="text-sm font-medium text-gray-600">Email</label>
+							<label htmlFor="email" className="text-sm font-medium text-gray-600">
+								Email
+							</label>
 							<Input
 								isInvalid={form.is_email_invalid}
 								errorMessage="Email invalide"
@@ -45,7 +47,9 @@ const Page = () => {
 								type="text"
 								onBlur={() => {
 									// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-									!form.email.includes('@') || !form.email.includes('.') ? setform((prev) => ({ ...prev, is_email_invalid: true })) : setform((prev) => ({ ...prev, is_email_invalid: false }));
+									!form.email.includes('@') || !form.email.includes('.')
+										? setform((prev) => ({ ...prev, is_email_invalid: true }))
+										: setform((prev) => ({ ...prev, is_email_invalid: false }));
 								}}
 								name="email"
 								placeholder="votre.email@exemple.com"
@@ -56,7 +60,9 @@ const Page = () => {
 							/>
 						</div>
 						<div className="flex flex-col gap-2">
-							<label htmlFor="password" className="text-sm font-medium text-gray-600">Mot de passe</label>
+							<label htmlFor="password" className="text-sm font-medium text-gray-600">
+								Mot de passe
+							</label>
 							<Input
 								type={isPasswordVisible ? 'text' : 'password'}
 								name="password"
