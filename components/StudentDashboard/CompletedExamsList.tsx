@@ -1,7 +1,9 @@
 import { getExamGradeOneStudent } from '@/backend_requests/exam_grades/getExamGradeOneStudent';
 import { getExamsOfClass } from '@/backend_requests/exams/getExamsOfClass';
+import { DASHBOARD_LIMITS } from '@/constants/dashboardLimits';
 import { ExamGrade, ExamWithDates } from '@/types/entitties';
 import { DocumentTextIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
 import ToDoExamCard from './ToDoExamCard';
 
 type ExamWithGrade = ExamWithDates & {
@@ -15,7 +17,7 @@ interface CompletedExamsListProps {
 
 const CompletedExamsList = async ({ idClass, idStudent }: CompletedExamsListProps) => {
 	// Récupérer les examens terminés
-	const completedExamsResponse = await getExamsOfClass(idClass, { status: 'completed', limit: 5 });
+	const completedExamsResponse = await getExamsOfClass(idClass, { status: 'completed', limit: DASHBOARD_LIMITS.COMPLETED_EXAMS });
 
 	if (!('success' in completedExamsResponse)) {
 		throw new Error('Erreur lors de la récupération des examens passés');
@@ -32,6 +34,8 @@ const CompletedExamsList = async ({ idClass, idStudent }: CompletedExamsListProp
 		})
 	);
 
+	const hasMore = completedExamsWithGrades.length === DASHBOARD_LIMITS.COMPLETED_EXAMS;
+
 	return (
 		<div>
 			<div className="flex items-center justify-between mb-4">
@@ -45,17 +49,25 @@ const CompletedExamsList = async ({ idClass, idStudent }: CompletedExamsListProp
 			</div>
 
 			{completedExamsWithGrades.length === 0 ? (
-				<div className="bg-white rounded-md border border-black/10 p-8 text-center">
+				<div className="bg-white rounded-xl border border-black/10 p-8 text-center">
 					<DocumentTextIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
 					<p className="text-gray-600">Aucun examen passé pour le moment</p>
 				</div>
 			) : (
 				<>
-					<div className="bg-white averageResponse rounded-md overflow-hidden border border-black/10 divide-y divide-gray-100">
+					<div className="bg-white rounded-xl border border-black/10 divide-y divide-gray-100">
 						{completedExamsWithGrades.map((exam) => (
 							<ToDoExamCard key={exam.idExam} idClass={idClass} exam={exam} idStudent={idStudent} />
 						))}
 					</div>
+					{hasMore && (
+						<Link
+							href={`/student/${idClass}/exams?status=completed`}
+							className="mt-4 block w-full text-center bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
+						>
+							Voir tous les examens passés
+						</Link>
+					)}
 				</>
 			)}
 		</div>

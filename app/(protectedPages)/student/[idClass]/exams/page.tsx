@@ -15,6 +15,7 @@ const page = async ({ params }: { params: Promise<{ idClass: string }> }) => {
 	const session = await auth();
 	const idStudent = session!.user!.idUser;
 
+	// Récupérer tous les examens de la classe
 	const allExamsResponse = await getExamsOfClass(idClassNumber);
 
 	// Vérification des erreurs
@@ -33,21 +34,28 @@ const page = async ({ params }: { params: Promise<{ idClass: string }> }) => {
 		})
 	);
 
-	// Calculer le status de chaque examen selon les dates
+	// Séparer les examens par statut selon les dates
 	const now = new Date();
 	const pendingExamsWithGrades = allExamsWithGrades.filter((exam) => {
+		const startDate = new Date(exam.start_date);
 		const endDate = new Date(exam.end_date);
-		return endDate >= now; // Examen à faire si la date de fin n'est pas dépassée
+		return startDate <= now && endDate >= now; // Examen en cours
 	});
+
 	const completedExamsWithGrades = allExamsWithGrades.filter((exam) => {
 		const endDate = new Date(exam.end_date);
-		return endDate < now; // Examen passé si la date de fin est dépassée
+		return endDate < now; // Examen terminé
+	});
+
+	const upcomingExams = allExamsResponse.data.filter((exam) => {
+		const startDate = new Date(exam.start_date);
+		return startDate > now; // Examen à venir (pas encore commencé)
 	});
 
 	return (
 		<div className="min-h-screen p-6">
 			<div className="max-w-7xl mx-auto">
-				<ExamsList pendingExams={pendingExamsWithGrades} completedExams={completedExamsWithGrades} idStudent={idStudent} />
+				<ExamsList pendingExams={pendingExamsWithGrades} completedExams={completedExamsWithGrades} upcomingExams={upcomingExams} idStudent={idStudent} idClass={idClassNumber} />
 			</div>
 		</div>
 	);

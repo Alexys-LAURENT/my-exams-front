@@ -1,5 +1,6 @@
 import { getExamGradesForStudentInClass } from '@/backend_requests/exam_grades/getExamGradesForStudentInClass';
 import { getOneExam } from '@/backend_requests/exams/getOneExam';
+import { DASHBOARD_LIMITS } from '@/constants/dashboardLimits';
 import { DocumentTextIcon, TrophyIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
@@ -9,7 +10,7 @@ interface LatestExamGradesProps {
 }
 
 const LatestExamGrades = async ({ idClass, idStudent }: LatestExamGradesProps) => {
-	const latestExamGrades = await getExamGradesForStudentInClass(idClass, idStudent, { limit: 5, status: 'corrected' });
+	const latestExamGrades = await getExamGradesForStudentInClass(idClass, idStudent, { limit: DASHBOARD_LIMITS.LATEST_GRADES, status: 'corrected' });
 
 	if (!('success' in latestExamGrades)) {
 		throw new Error('Erreur lors de la récupération des notes');
