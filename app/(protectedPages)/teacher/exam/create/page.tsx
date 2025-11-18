@@ -1,21 +1,15 @@
 'use client';
 import { createAnswer } from '@/backend_requests/answers/createAnswers';
-import { getAllClassesForOneTeacher } from '@/backend_requests/classes/getAllClassesForOneTeacher';
-import { putExamsForClass } from '@/backend_requests/classes/putExamsForClass';
-import { getClassDegree } from '@/backend_requests/degrees/getClassDegree';
 import { createExam } from '@/backend_requests/exams/createExam';
 import { createQuestion } from '@/backend_requests/questions/createQuestion';
-import { ClassWithDegree } from '@/types/entitties';
 import { ArrowLeftIcon, CheckIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { Button } from '@heroui/button';
 import { Checkbox } from '@heroui/checkbox';
 import { Input, Textarea } from '@heroui/input';
-import { Select, SelectItem } from '@heroui/select';
 import { Switch } from '@heroui/switch';
-import { Selection } from '@react-types/shared';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 type QuestionData = {
 	id: number;
@@ -38,8 +32,6 @@ const Page = () => {
 	const [examTitle, setExamTitle] = useState('');
 	const [examDescription, setExamDescription] = useState('');
 	const [examDuration, setExamDuration] = useState('');
-	const [selectedClasses, setSelectedClasses] = useState<Selection>(new Set([]));
-	const [availableClasses, setAvailableClasses] = useState<ClassWithDegree[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 
 	const [questions, setQuestions] = useState<QuestionData[]>([]);
@@ -48,27 +40,6 @@ const Page = () => {
 	const TOTAL_POINTS = 20;
 	const usedPoints = questions.reduce((sum, q) => sum + q.maxPoints, 0);
 	const remainingPoints = TOTAL_POINTS - usedPoints;
-
-	useEffect(() => {
-		const loadClasses = async () => {
-			if (session?.user?.idUser) {
-				const response = await getAllClassesForOneTeacher(session.user.idUser);
-				if ('data' in response) {
-					// Loop to get full class data with getClassDegree
-					const classesWithDegree: ClassWithDegree[] = [];
-					for (const classe of response.data) {
-						const degreeResponse = await getClassDegree(classe.idClass);
-						if ('data' in degreeResponse) {
-							classesWithDegree.push({ ...classe, degree: degreeResponse.data });
-						}
-					}
-
-					setAvailableClasses(classesWithDegree);
-				}
-			}
-		};
-		loadClasses();
-	}, [session]);
 
 	const addNewQuestion = () => {
 		const newQuestion: QuestionData = {
@@ -178,10 +149,6 @@ const Page = () => {
 			alert("Veuillez entrer une durée valide pour l'examen");
 			return;
 		}
-		if (selectedClasses === 'all' || selectedClasses.size === 0) {
-			alert('Veuillez sélectionner au moins une classe');
-			return;
-		}
 		if (questions.length === 0) {
 			alert('Veuillez ajouter au moins une question');
 			return;
@@ -262,14 +229,6 @@ const Page = () => {
 				}
 			}
 
-			const classIds = Array.from(selectedClasses) as string[];
-			for (const classId of classIds) {
-				await putExamsForClass(Number(classId), examId, {
-					start_date: new Date().toISOString(),
-					end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-				});
-			}
-
 			alert('Examen créé avec succès !');
 			router.push(`/teacher/exams/${examResponse.data.idExam}`);
 		} catch (error) {
@@ -287,14 +246,14 @@ const Page = () => {
 					<h1 className="font-semibold text-xl">Créer un nouvel examen</h1>
 					<h2>Configurez les détails de votre examen et ajouter vos questions</h2>
 				</div>
-				<div className="bg-white rounded-xl py-6 gap-8 flex flex-col mx-10">
+				<div className="bg-white border border-black/10 rounded-xl py-6 gap-8 flex flex-col mx-10">
 					<div className="px-12 flex gap-8 items-center">
 						<Input
 							variant="bordered"
 							label="Titre de l'examen"
 							placeholder="Ex : Mathématique - Chapitre 5"
 							labelPlacement="outside-top"
-							className="w-1/3"
+							className="w-1/2"
 							value={examTitle}
 							onValueChange={setExamTitle}
 							isRequired
@@ -305,7 +264,7 @@ const Page = () => {
 							label="Durée (minutes)"
 							placeholder="Durée"
 							labelPlacement="outside-top"
-							className="w-1/3"
+							className="w-1/2"
 							type="number"
 							step={1}
 							min={1}
@@ -314,24 +273,6 @@ const Page = () => {
 							isRequired
 							errorMessage={() => null}
 						/>
-						<Select
-							variant="bordered"
-							label="Classe(s)"
-							placeholder="Choisir une classe"
-							labelPlacement="outside"
-							className="w-1/3"
-							selectionMode="multiple"
-							selectedKeys={selectedClasses}
-							onSelectionChange={setSelectedClasses}
-							isRequired
-							errorMessage={() => null}
-						>
-							{availableClasses.map((classe) => (
-								<SelectItem key={classe.idClass} textValue={classe.degree.name}>
-									{classe.degree.name}
-								</SelectItem>
-							))}
-						</Select>
 					</div>
 					<div className="px-12 flex items-center">
 						<Textarea
@@ -345,9 +286,6 @@ const Page = () => {
 						/>
 					</div>
 					<div className="px-6 flex gap-4 items-center">
-						<Button variant="solid" color="primary" startContent={<PlusIcon className="w-5 h-5" />} onPress={addNewQuestion}>
-							Ajouter une question
-						</Button>
 						<span className="text-sm text-gray-500">{questions.length} question(s) ajoutée(s)</span>
 						<span className="text-sm font-medium">•</span>
 						<span className={`text-sm font-medium ${remainingPoints < 0 ? 'text-danger' : remainingPoints === 0 ? 'text-success' : 'text-primary'}`}>
@@ -370,24 +308,14 @@ const Page = () => {
 						</div>
 					)}
 				</div>
-				{questions.length === 0 ? (
-					<div className="bg-white rounded-xl py-6 flex gap-6 flex-col mx-10 border-2 border-dashed border-gray-300 justify-center items-center">
-						<div className="flex flex-col gap-2">
-							<p className="text-white w-10 h-10 text-xl bg-gray-300 rounded-full flex text-center items-center justify-center mx-auto font-bold">?</p>
-							<p className="text-center text-gray-500">Aucune question ajoutée</p>
-							<p className="text-center text-gray-500">Commencez par ajouter votre première question à l&apos;examen.</p>
-						</div>
-						<Button variant="solid" color="primary" className="w-fit" startContent={<PlusIcon className="w-5 h-5" />} onPress={addNewQuestion}>
-							Ajouter une question
-						</Button>
-					</div>
-				) : (
+
+				{questions.length > 0 && (
 					<div className="flex flex-col gap-4 mx-10">
 						{questions.map((question, index) => {
 							const isEditing = editingQuestionId === question.id;
 
 							return (
-								<div key={question.id} className={`bg-white rounded-xl py-6 px-8 flex flex-col gap-4 ${isEditing ? 'border-2 border-primary' : ''}`}>
+								<div key={question.id} className={`bg-white border border-black/10 rounded-xl py-6 px-8 flex flex-col gap-4 ${isEditing ? 'border-2 border-primary' : ''}`}>
 									<div className="flex justify-between items-start">
 										<span className="font-semibold text-lg">Question {index + 1}</span>
 										<div className="flex gap-2">
@@ -532,6 +460,20 @@ const Page = () => {
 						})}
 					</div>
 				)}
+
+				{/* Encadré toujours visible pour ajouter une question */}
+				<div className="bg-white rounded-xl py-6 flex gap-6 flex-col mx-10 border-2 border-dashed border-gray-300 justify-center items-center">
+					<div className="flex flex-col gap-2">
+						<p className="text-white w-10 h-10 text-xl bg-gray-300 rounded-full flex text-center items-center justify-center mx-auto font-bold">+</p>
+						<p className="text-center text-gray-500">{questions.length === 0 ? 'Aucune question ajoutée' : 'Ajouter une nouvelle question'}</p>
+						<p className="text-center text-gray-500">
+							{questions.length === 0 ? "Commencez par ajouter votre première question à l'examen." : 'Cliquez sur le bouton ci-dessous pour ajouter une question supplémentaire.'}
+						</p>
+					</div>
+					<Button variant="solid" color="primary" className="w-fit" startContent={<PlusIcon className="w-5 h-5" />} onPress={addNewQuestion}>
+						Ajouter une question
+					</Button>
+				</div>
 			</div>
 
 			<div className="w-full justify-between flex">

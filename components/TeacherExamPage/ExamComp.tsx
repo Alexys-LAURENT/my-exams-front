@@ -1,7 +1,7 @@
 import { ExamWithQuestionCount } from '@/app/(protectedPages)/teacher/exams/page';
-import Link from 'next/dist/client/link';
 import formatDateWithShortMonth from '@/utils/formatDateWithShortMonth';
-import { DocumentTextIcon, ClockIcon, CalendarIcon } from '@heroicons/react/24/outline';
+import { CalendarIcon, ClockIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
+import Link from 'next/dist/client/link';
 
 const formatTime = (minutes: number) => {
 	if (minutes < 60) {
@@ -38,7 +38,7 @@ const ExamComp = ({ exam }: { exam: ExamWithQuestionCount }) => {
 						</div>
 						<div className="flex items-center gap-1">
 							<CalendarIcon className="w-4 h-4 text-amber-500" />
-							<span>{formatDateWithShortMonth(exam.createdAt)}</span>
+							<span>Créé le {formatDateWithShortMonth(exam.createdAt)}</span>
 						</div>
 					</div>
 
