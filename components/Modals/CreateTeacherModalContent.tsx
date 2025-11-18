@@ -130,6 +130,8 @@ const CreateTeacherModalContent = ({ existingTeacher }: CreateTeacherModalConten
 							}
 							value={formPassword}
 							onChange={(e) => setFormPassword(e.target.value)}
+							errorMessage={formPassword && formPassword.length < 6 ? 'Le mot de passe doit contenir au moins 6 caractères' : ''}
+							isInvalid={formPassword.length > 0 && formPassword.length < 6}
 						/>
 					)}
 				</form>
