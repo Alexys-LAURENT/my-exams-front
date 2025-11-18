@@ -1,8 +1,8 @@
 'use client';
 
 import { deleteTeacher } from '@/backend_requests/teachers/deleteTeacher';
+import { DeleteConfirmPopover } from '@/components/AdminPage/DeleteConfirmPopover';
 import { ToastContext } from '@/Context/ToastContext';
-import { Button } from '@heroui/button';
 import { useRouter } from 'next/navigation';
 import { useContext, useState } from 'react';
 
@@ -17,19 +17,15 @@ export const DeleteTeacherButton = ({ idTeacher, teacherName }: DeleteTeacherBut
 	const [isLoading, setIsLoading] = useState(false);
 
 	const handleDelete = async () => {
-		if (!confirm(`Êtes-vous sûr de vouloir supprimer l'enseignant "${teacherName}" ?`)) {
-			return;
-		}
-
 		try {
 			setIsLoading(true);
 			const res = await deleteTeacher(idTeacher);
 
 			if (!('success' in res)) {
-				return customToast.error("Erreur lors de la suppression de l'enseignant");
+				customToast.error("Erreur lors de la suppression de l'enseignant");
 			} else {
 				customToast.success('Enseignant supprimé avec succès');
-				return router.refresh();
+				router.refresh();
 			}
 		} catch (error) {
 			console.error(error);
@@ -39,9 +35,5 @@ export const DeleteTeacherButton = ({ idTeacher, teacherName }: DeleteTeacherBut
 		}
 	};
 
-	return (
-		<Button size="sm" color="danger" variant="flat" onPress={handleDelete} isLoading={isLoading}>
-			Supprimer
-		</Button>
-	);
+	return <DeleteConfirmPopover entityName={teacherName} entityType="enseignant" onConfirm={handleDelete} isLoading={isLoading} />;
 };

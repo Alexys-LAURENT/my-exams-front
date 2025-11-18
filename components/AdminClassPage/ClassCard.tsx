@@ -1,10 +1,11 @@
 'use client';
 import { deleteClass } from '@/backend_requests/classes/deleteClass';
+import { DeleteConfirmPopover } from '@/components/AdminPage/DeleteConfirmPopover';
 import { ToastContext } from '@/Context/ToastContext';
 import { Class } from '@/types/entitties';
 import { Button } from '@heroui/button';
 import { useRouter } from 'next/navigation';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 
 interface ClassCardProps {
 	classe: Class;
@@ -14,6 +15,7 @@ interface ClassCardProps {
 export const ClassCard = ({ classe, degreeName }: ClassCardProps) => {
 	const router = useRouter();
 	const { customToast } = useContext(ToastContext);
+	const [isLoading, setIsLoading] = useState(false);
 
 	const formatDate = (dateString: string) => {
 		return new Date(dateString).toLocaleDateString('fr-FR', {
@@ -24,11 +26,8 @@ export const ClassCard = ({ classe, degreeName }: ClassCardProps) => {
 	};
 
 	const handleDelete = async () => {
-		if (!confirm(`Êtes-vous sûr de vouloir supprimer la classe "${classe.name}" ?`)) {
-			return;
-		}
-
 		try {
+			setIsLoading(true);
 			const resDelete = await deleteClass(classe.idClass);
 			if (!('success' in resDelete)) {
 				throw new Error('Erreur lors de la suppression de la classe');
@@ -38,6 +37,8 @@ export const ClassCard = ({ classe, degreeName }: ClassCardProps) => {
 		} catch (error) {
 			console.error('ClassCard:Error::', error);
 			customToast.error('Erreur lors de la suppression de la classe');
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -46,7 +47,7 @@ export const ClassCard = ({ classe, degreeName }: ClassCardProps) => {
 	};
 
 	return (
-		<div className="bg-white rounded-lg border border-gray-200 p-6 ">
+		<div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-all duration-200 hover:border-blue-300">
 			<div className="flex justify-between items-start mb-4">
 				<div className="flex flex-col gap-2">
 					<div className="flex items-center gap-3">
@@ -66,9 +67,17 @@ export const ClassCard = ({ classe, degreeName }: ClassCardProps) => {
 					<Button onPress={handleViewDetails} size="sm" color="primary" variant="flat" className="font-medium">
 						Voir les détails
 					</Button>
-					<Button onPress={handleDelete} size="sm" color="danger" variant="flat" className="font-medium">
-						Supprimer
-					</Button>
+					<DeleteConfirmPopover
+						entityName={classe.name}
+						entityType="classe"
+						onConfirm={handleDelete}
+						isLoading={isLoading}
+						triggerButton={
+							<Button size="sm" color="danger" variant="flat" className="font-medium" isLoading={isLoading}>
+								Supprimer
+							</Button>
+						}
+					/>
 				</div>
 			</div>
 		</div>
