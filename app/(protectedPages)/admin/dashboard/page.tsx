@@ -1,22 +1,15 @@
-import Link from 'next/link';
-import { auth } from '@/utils/auth';
-import { getAllStudents } from '@/backend_requests/students/getAllStudents';
-import { getAllTeachers } from '@/backend_requests/teachers/getAllTeachers';
 import { getAllClasses } from '@/backend_requests/classes/getAllClasses';
 import { getAllDegrees } from '@/backend_requests/degrees/getAllDegrees';
+import { getAllMatieres } from '@/backend_requests/matieres/getAllMatieres';
+import { getAllStudents } from '@/backend_requests/students/getAllStudents';
+import { getAllTeachers } from '@/backend_requests/teachers/getAllTeachers';
+import Link from 'next/link';
 
 const AdminDashboard = async () => {
-	const loggedUser = await auth();
-
 	// Récupérer les données pour les counts
-	const [studentsData, teachersData, classesData, degreesData] = await Promise.all([
-		getAllStudents(),
-		getAllTeachers(),
-		getAllClasses(),
-		getAllDegrees(),
-	]);
+	const [studentsData, teachersData, classesData, degreesData, matieresData] = await Promise.all([getAllStudents(), getAllTeachers(), getAllClasses(), getAllDegrees(), getAllMatieres()]);
 
-	if(!('success' in studentsData) || !('success' in teachersData) || !('success' in classesData) || !('success' in degreesData) ){
+	if (!('success' in studentsData) || !('success' in teachersData) || !('success' in classesData) || !('success' in degreesData) || !('success' in matieresData)) {
 		throw new Error('Error fetching data');
 	}
 
@@ -25,6 +18,7 @@ const AdminDashboard = async () => {
 	const teachersCount = teachersData.data.length;
 	const classesCount = classesData.data.length;
 	const degreesCount = degreesData.data.length;
+	const matieresCount = matieresData.data.length;
 
 	const dashboardCards = [
 		{
@@ -59,6 +53,14 @@ const AdminDashboard = async () => {
 			color: 'from-orange-500 to-orange-600',
 			count: degreesCount,
 		},
+		{
+			title: 'Matières',
+			description: 'Gérer les matières enseignées',
+			icon: '📚',
+			href: '/admin/matieres',
+			color: 'from-red-500 to-red-600',
+			count: matieresCount,
+		},
 	];
 
 	return (
@@ -74,14 +76,14 @@ const AdminDashboard = async () => {
 						key={index}
 						href={card.href}
 						className="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
-						>
+					>
 						<div className={`absolute inset-0 bg-gradient-to-br ${card.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
-						<div className="relative p-6 flex flex-col gap-4">
+						<div className="relative p-6 flex flex-col gap-4 h-full">
 							<div className="flex items-center justify-between">
 								<div className="text-5xl">{card.icon}</div>
 								<div className={`w-12 h-12 rounded-full bg-gradient-to-br ${card.color} opacity-20 group-hover:opacity-30 transition-opacity`} />
 							</div>
-							<div className="flex flex-col gap-2">
+							<div className="flex flex-col gap-2 h-full">
 								<h2 className="text-2xl font-bold text-gray-800 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 transition-all">
 									{card.title}
 								</h2>
@@ -89,9 +91,7 @@ const AdminDashboard = async () => {
 							</div>
 							<div className="pt-4 border-t border-gray-200 flex items-center justify-between">
 								<p className="text-xs text-gray-500 uppercase tracking-wider">Total</p>
-								<p className={`text-2xl font-bold bg-gradient-to-r ${card.color} bg-clip-text text-transparent`}>
-									{card.count}
-								</p>
+								<p className={`text-2xl font-bold bg-gradient-to-r ${card.color} bg-clip-text text-transparent`}>{card.count}</p>
 							</div>
 						</div>
 					</Link>

@@ -1,3 +1,8 @@
+export type Matiere = {
+	idMatiere: number;
+	nom: string;
+};
+
 export type User = {
 	idUser: number;
 	lastName: string;
@@ -44,6 +49,7 @@ export type Exam = {
 	desc: string | null;
 	time: number;
 	idTeacher: number;
+	idMatiere: number;
 	imagePath: string | null;
 	createdAt: string;
 	updatedAt: string | null;

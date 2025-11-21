@@ -1,7 +1,8 @@
 import { getAllClassesForOneTeacher } from '@/backend_requests/classes/getAllClassesForOneTeacher';
 import { getClassDegree } from '@/backend_requests/degrees/getClassDegree';
+import { getTeacherMatieres } from '@/backend_requests/matieres/getTeacherMatieres';
 import { getAllTeachers } from '@/backend_requests/teachers/getAllTeachers';
-import { RemoveTeacherFromClassButton, TeacherActions } from '@/components/AdminTeacherPage';
+import { RemoveTeacherFromClassButton, RemoveTeacherFromMatiereButton, TeacherActions, TeacherMatiereActions } from '@/components/AdminTeacherPage';
 import { Avatar } from '@heroui/avatar';
 import Link from 'next/link';
 
@@ -33,6 +34,14 @@ const Page = async ({ params }: PageProps) => {
 	}
 
 	const classes = classesResponse.data;
+
+	// Récupérer les matières de l'enseignant
+	const matieresResponse = await getTeacherMatieres(idTeacherNumber);
+	if (!('success' in matieresResponse) || !matieresResponse.success) {
+		throw new Error("Impossible de récupérer les matières de l'enseignant");
+	}
+
+	const matieres = matieresResponse.data;
 
 	// Récupérer les diplômes pour chaque classe
 	const classesWithDetails = await Promise.all(
@@ -86,7 +95,7 @@ const Page = async ({ params }: PageProps) => {
 			</div>
 
 			{/* Carte d'informations */}
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 				{/* Carte nombre de classes */}
 				<div className="bg-white rounded-lg border border-gray-200 p-6">
 					<h3 className="text-sm font-semibold text-gray-600 mb-3">Classes enseignées</h3>
@@ -94,10 +103,56 @@ const Page = async ({ params }: PageProps) => {
 					<p className="text-sm text-gray-500 mt-1">classe{classes.length > 1 ? 's' : ''}</p>
 				</div>
 
+				{/* Carte nombre de matières */}
+				<div className="bg-white rounded-lg border border-gray-200 p-6">
+					<h3 className="text-sm font-semibold text-gray-600 mb-3">Matières enseignées</h3>
+					<p className="text-4xl font-bold text-purple-600">{matieres.length}</p>
+					<p className="text-sm text-gray-500 mt-1">matière{matieres.length > 1 ? 's' : ''}</p>
+				</div>
+
 				{/* Carte type de compte */}
 				<div className="bg-white rounded-lg border border-gray-200 p-6">
 					<h3 className="text-sm font-semibold text-gray-600 mb-3">Type de compte</h3>
 					<p className="text-2xl font-bold text-green-600 capitalize">{teacher.accountType}</p>
+				</div>
+			</div>
+
+			{/* Liste des matières */}
+			<div className="bg-white rounded-lg border border-gray-200">
+				<div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+					<h2 className="text-xl font-bold text-gray-900">Matières enseignées ({matieres.length})</h2>
+					<TeacherMatiereActions idTeacher={idTeacherNumber} existingMatiereIds={matieres.map((m) => m.idMatiere)} />
+				</div>
+				<div className="p-6">
+					{matieres.length === 0 ? (
+						<div className="text-center py-12">
+							<p className="text-gray-500">Cet enseignant n&apos;est assigné à aucune matière</p>
+							<p className="text-sm text-gray-400 mt-2">Cliquez sur &quot;Ajouter à des matières&quot; pour commencer</p>
+						</div>
+					) : (
+						<div className="overflow-x-auto">
+							<table className="w-full">
+								<thead>
+									<tr className="border-b border-gray-200">
+										<th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">ID</th>
+										<th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Nom de la matière</th>
+										<th className="text-right py-3 px-4 text-sm font-semibold text-gray-600">Actions</th>
+									</tr>
+								</thead>
+								<tbody>
+									{matieres.map((matiere) => (
+										<tr key={matiere.idMatiere} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+											<td className="py-4 px-4 text-sm text-gray-600">#{matiere.idMatiere}</td>
+											<td className="py-4 px-4 text-sm font-medium text-gray-900">{matiere.nom}</td>
+											<td className="py-4 px-4 text-right">
+												<RemoveTeacherFromMatiereButton idMatiere={matiere.idMatiere} idTeacher={idTeacherNumber} matiereName={matiere.nom} isLastMatiere={matieres.length === 1} />
+											</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
+					)}
 				</div>
 			</div>
 

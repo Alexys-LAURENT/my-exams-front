@@ -1,14 +1,16 @@
 'use client';
+import { getAllMatieres } from '@/backend_requests/matieres/getAllMatieres';
 import { createTeacher } from '@/backend_requests/teachers/createTeacher';
 import { updateTeacher } from '@/backend_requests/teachers/updateTeacher';
 import { ModalContext } from '@/Context/ModalContext';
 import { ToastContext } from '@/Context/ToastContext';
-import { User } from '@/types/entitties';
+import { Matiere, User } from '@/types/entitties';
 import { Button } from '@heroui/button';
 import { Input } from '@heroui/input';
 import { ModalBody, ModalFooter, ModalHeader } from '@heroui/modal';
+import { Select, SelectItem } from '@heroui/select';
 import { useRouter } from 'next/navigation';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 interface CreateTeacherModalContentProps {
 	existingTeacher?: User;
@@ -23,9 +25,32 @@ const CreateTeacherModalContent = ({ existingTeacher }: CreateTeacherModalConten
 	const [formName, setFormName] = useState(existingTeacher?.name || '');
 	const [formEmail, setFormEmail] = useState(existingTeacher?.email || '');
 	const [formPassword, setFormPassword] = useState('');
+	const [selectedMatiereIds, setSelectedMatiereIds] = useState<Set<string>>(new Set());
+	const [matieres, setMatieres] = useState<Matiere[]>([]);
+	const [isMounted, setIsMounted] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 
 	const isEditMode = !!existingTeacher;
+
+	useEffect(() => {
+		if (isMounted || isEditMode) return;
+		try {
+			const fetchMatieres = async () => {
+				const res = await getAllMatieres();
+				if ('success' in res) {
+					setMatieres(res.data);
+				} else {
+					console.error('CreateTeacherModalContent:Error::', 'message' in res ? res.message : 'Unknown error');
+					throw new Error('Erreur lors de la récupération des matières');
+				}
+			};
+			fetchMatieres();
+			setIsMounted(true);
+		} catch {
+			customToast.error('Erreur lors de la récupération des matières');
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	const handleSubmit = async () => {
 		try {
@@ -36,6 +61,11 @@ const CreateTeacherModalContent = ({ existingTeacher }: CreateTeacherModalConten
 
 			if (!isEditMode && !formPassword) {
 				customToast.error('Le mot de passe est obligatoire pour créer un enseignant');
+				return;
+			}
+
+			if (!isEditMode && selectedMatiereIds.size === 0) {
+				customToast.error('Veuillez sélectionner au moins une matière');
 				return;
 			}
 
@@ -52,15 +82,16 @@ const CreateTeacherModalContent = ({ existingTeacher }: CreateTeacherModalConten
 						name: formName,
 						email: formEmail,
 						password: formPassword,
+						matiereIds: Array.from(selectedMatiereIds).map((id) => Number(id)),
 				  });
 
 			if (!('success' in res)) {
 				return customToast.error(`Erreur lors de ${isEditMode ? 'la modification' : 'la création'} de l'enseignant`);
-			} else {
-				closeModal();
-				customToast.success(`Enseignant ${isEditMode ? 'modifié' : 'créé'} avec succès`);
-				return router.refresh();
 			}
+
+			closeModal();
+			customToast.success(`Enseignant ${isEditMode ? 'modifié' : 'créé'} avec succès`);
+			return router.refresh();
 		} catch (error) {
 			console.error(error);
 			customToast.error(`Erreur lors de ${isEditMode ? 'la modification' : 'la création'} de l'enseignant`);
@@ -117,22 +148,47 @@ const CreateTeacherModalContent = ({ existingTeacher }: CreateTeacherModalConten
 						onChange={(e) => setFormEmail(e.target.value)}
 					/>
 					{!isEditMode && (
-						<Input
-							type="password"
-							placeholder={'Entrez le mot de passe'}
-							labelPlacement="outside"
-							size="sm"
-							label={
-								<>
-									{'Mot de passe'}
-									<span className="text-red-500">*</span>
-								</>
-							}
-							value={formPassword}
-							onChange={(e) => setFormPassword(e.target.value)}
-							errorMessage={formPassword && formPassword.length < 6 ? 'Le mot de passe doit contenir au moins 6 caractères' : ''}
-							isInvalid={formPassword.length > 0 && formPassword.length < 6}
-						/>
+						<>
+							<Input
+								type="password"
+								placeholder={'Entrez le mot de passe'}
+								labelPlacement="outside"
+								size="sm"
+								label={
+									<>
+										{'Mot de passe'}
+										<span className="text-red-500">*</span>
+									</>
+								}
+								value={formPassword}
+								onChange={(e) => setFormPassword(e.target.value)}
+								errorMessage={formPassword && formPassword.length < 6 ? 'Le mot de passe doit contenir au moins 6 caractères' : ''}
+								isInvalid={formPassword.length > 0 && formPassword.length < 6}
+							/>
+							<Select
+								label={
+									<>
+										{'Matières'}
+										<span className="text-red-500">*</span>
+									</>
+								}
+								labelPlacement="outside"
+								selectionMode="multiple"
+								selectedKeys={selectedMatiereIds}
+								placeholder={'Sélectionner au moins une matière'}
+								className="!bg-bg_light_secondary dark:!bg-bg_dark_secondary custom-multiple-select !border-none"
+								onSelectionChange={(keys) => {
+									setSelectedMatiereIds(keys as Set<string>);
+								}}
+								items={matieres}
+							>
+								{(item) => (
+									<SelectItem key={item.idMatiere.toString()} textValue={item.nom}>
+										{item.nom}
+									</SelectItem>
+								)}
+							</Select>
+						</>
 					)}
 				</form>
 			</ModalBody>
@@ -145,7 +201,7 @@ const CreateTeacherModalContent = ({ existingTeacher }: CreateTeacherModalConten
 					className="bg-blue-500 text-white font-semibold"
 					isLoading={isLoading}
 					onPress={() => handleSubmit()}
-					isDisabled={!formLastName || !formName || !formEmail || (!isEditMode && !formPassword)}
+					isDisabled={!formLastName || !formName || !formEmail || (!isEditMode && (!formPassword || selectedMatiereIds.size === 0))}
 				>
 					{isEditMode ? "Modifier l'enseignant" : "Créer l'enseignant"}
 				</Button>

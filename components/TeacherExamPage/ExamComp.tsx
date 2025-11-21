@@ -1,6 +1,6 @@
-import { ExamWithQuestionCount } from '@/app/(protectedPages)/teacher/exams/page';
+import { ExamWithAdditionalData } from '@/app/(protectedPages)/teacher/exams/page';
 import formatDateWithShortMonth from '@/utils/formatDateWithShortMonth';
-import { CalendarIcon, ClockIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
+import { CalendarIcon, ClockIcon, DocumentTextIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
 import Link from 'next/dist/client/link';
 
 const formatTime = (minutes: number) => {
@@ -12,7 +12,7 @@ const formatTime = (minutes: number) => {
 	return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}min` : `${hours}h`;
 };
 
-const ExamComp = ({ exam }: { exam: ExamWithQuestionCount }) => {
+const ExamComp = ({ exam }: { exam: ExamWithAdditionalData }) => {
 	return (
 		<Link
 			key={exam.idExam}
@@ -31,7 +31,7 @@ const ExamComp = ({ exam }: { exam: ExamWithQuestionCount }) => {
 							<span>{formatTime(exam.time)}</span>
 						</div>
 						<div className="flex items-center gap-1">
-							<DocumentTextIcon className="w-4 h-4 text-amber-500" />
+							<QuestionMarkCircleIcon className="w-4 h-4 text-amber-500" />
 							<span>
 								{exam.questionsCount} question{exam.questionsCount !== 1 ? 's' : ''}
 							</span>
@@ -39,6 +39,10 @@ const ExamComp = ({ exam }: { exam: ExamWithQuestionCount }) => {
 						<div className="flex items-center gap-1">
 							<CalendarIcon className="w-4 h-4 text-amber-500" />
 							<span>Créé le {formatDateWithShortMonth(exam.createdAt)}</span>
+						</div>
+						<div className="flex items-center gap-1">
+							<DocumentTextIcon className="w-4 h-4 text-amber-500" />
+							<span>{exam.matiere.nom}</span>
 						</div>
 					</div>
 

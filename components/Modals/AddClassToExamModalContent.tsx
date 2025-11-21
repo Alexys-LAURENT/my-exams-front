@@ -19,6 +19,7 @@ interface AddClassToExamModalContentProps {
 	idExam: number;
 	existingClassIds: number[];
 	idTeacher: number;
+	examTimeMinutes: number;
 }
 
 type ClassWithDegree = Class & { degree: Degree | null };
@@ -30,7 +31,7 @@ type ClassFormData = {
 	endDate: ZonedDateTime | null;
 };
 
-const AddClassToExamModalContent = ({ idExam, existingClassIds, idTeacher }: AddClassToExamModalContentProps) => {
+const AddClassToExamModalContent = ({ idExam, existingClassIds, idTeacher, examTimeMinutes }: AddClassToExamModalContentProps) => {
 	const { customToast } = useContext(ToastContext);
 	const { closeModal } = useContext(ModalContext);
 	const router = useRouter();
@@ -156,8 +157,16 @@ const AddClassToExamModalContent = ({ idExam, existingClassIds, idTeacher }: Add
 				const classStart = new Date(classe.startDate);
 				const classEnd = new Date(classe.endDate);
 
+				// Calculer la date de fin minimale en fonction de la durée de l'examen
+				const minEndDate = new Date(start.getTime() + examTimeMinutes * 60000);
+
 				if (end <= start) {
 					customToast.error(`Pour la classe ${classe.name}: La date de fin doit être après la date de début`);
+					return;
+				}
+
+				if (examTimeMinutes > 0 && end < minEndDate) {
+					customToast.error(`Pour la classe ${classe.name}: La date de fin doit être au moins ${examTimeMinutes} minutes après la date de début (durée de l'examen)`);
 					return;
 				}
 
