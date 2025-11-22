@@ -124,6 +124,7 @@ export type ExamGrade = {
 	status: 'en cours' | 'à corrigé' | 'corrigé';
 	idUser: number;
 	idExam: number;
+	idClass: number;
 	createdAt: string;
 	updatedAt: string | null;
 };

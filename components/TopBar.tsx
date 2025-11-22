@@ -12,7 +12,7 @@ const TopBar = ({ loggedUser }: { loggedUser: Session }) => {
 	const studentLiknks = [
 		...(params.idClass
 			? [
-					{ label: 'Mes examens', href: `/student/${params.idClass}/exams` },
+					{ label: 'Mes examens', href: `/student/${params.idClass}/exams?status=pending` },
 					{ label: 'Dashboard', href: `/student/${params.idClass}/dashboard` },
 			  ]
 			: []),
