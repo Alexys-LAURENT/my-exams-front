@@ -1,7 +1,9 @@
 import { getAllAnswersForOneQuestionOfOneExam } from '@/backend_requests/answers/getAllAnswersForOneQuestionOfOneExam';
 import { getAllClassesForOneExam } from '@/backend_requests/classes/getClassesForOneExam';
+import { getExamClasses } from '@/backend_requests/classes/getExamClasses';
 import { getClassDegree } from '@/backend_requests/degrees/getClassDegree';
 import { getOneExam } from '@/backend_requests/exams/getOneExam';
+import { getOneMatiere } from '@/backend_requests/matieres/getOneMatiere';
 import { getAllQuestionsForOneExam } from '@/backend_requests/questions/getAllQuestionsForOneExam';
 import AddClassToExam from '@/components/TeacherExamByIdPage/AddClassToExam';
 import ClassComp from '@/components/TeacherExamByIdPage/ClassComp';
@@ -9,7 +11,8 @@ import TimerIcon from '@/components/svg/TimerIcon';
 import { auth } from '@/utils/auth';
 import formatDateWithShortMonth from '@/utils/formatDateWithShortMonth';
 import { formatExamTime } from '@/utils/formatExamTime';
-import { DocumentTextIcon } from '@heroicons/react/24/outline';
+import { DocumentTextIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
+import { Button } from '@heroui/button';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -23,8 +26,12 @@ const Page = async ({ params }: { params: Promise<{ idExam: string }> }) => {
 		redirect('/login');
 	}
 
-	const [examResponse, questionsResponse, classesResponse] = await Promise.all([getOneExam(idExamNumber), getAllQuestionsForOneExam(idExamNumber), getAllClassesForOneExam(idExamNumber)]);
-
+	const [examResponse, questionsResponse, classesResponse, examClassesResponse] = await Promise.all([
+		getOneExam(idExamNumber),
+		getAllQuestionsForOneExam(idExamNumber),
+		getAllClassesForOneExam(idExamNumber),
+		getExamClasses(idExamNumber),
+	]);
 	if (!('success' in examResponse) || !('success' in questionsResponse) || !('success' in classesResponse)) {
 		throw new Error("Erreur lors du chargement de l'examen");
 	}
@@ -32,6 +39,25 @@ const Page = async ({ params }: { params: Promise<{ idExam: string }> }) => {
 	const exam = examResponse.data;
 	const questions = questionsResponse.data;
 	const classes = classesResponse.data;
+
+	// Vérifier si l'examen peut être modifié (aucune classe n'a commencé)
+	// Si la route n'existe pas encore, on autorise l'édition par défaut
+	let canEditExam = true;
+	if ('success' in examClassesResponse && examClassesResponse.success) {
+		const now = new Date();
+		canEditExam = !examClassesResponse.data.some((examClass) => {
+			const startDate = new Date(examClass.start_date);
+			return startDate <= now;
+		});
+	}
+
+	// Récupérer la matière pour l'exam
+	const matiereResponse = await getOneMatiere(exam.idMatiere);
+	if (!('success' in matiereResponse)) {
+		throw new Error('Erreur lors de la récupération de la matière');
+	}
+
+	const matiere = matiereResponse.data;
 
 	// Récupérer les réponses pour chaque question
 	const questionsWithAnswers = await Promise.all(
@@ -63,9 +89,18 @@ const Page = async ({ params }: { params: Promise<{ idExam: string }> }) => {
 	return (
 		<div className="flex flex-col w-full gap-6 p-4 mx-auto md:p-6">
 			{/* Backlink */}
-			<Link href="/teacher/exams" className="inline-flex items-center  font-medium">
-				← Retour aux examens
-			</Link>
+			<div className="flex items-center justify-between">
+				<Link href="/teacher/exams" className="inline-flex items-center  font-medium">
+					← Retour aux examens
+				</Link>
+				{canEditExam && (
+					<Link href={`/teacher/exams/${idExamNumber}/edit`}>
+						<Button color="primary" variant="flat" startContent={<PencilSquareIcon className="w-5 h-5" />}>
+							Modifier l&apos;examen
+						</Button>
+					</Link>
+				)}
+			</div>
 
 			{/* Bloc d'informations de l'examen */}
 			<div className="p-6 bg-white border rounded-lg border-black/10">
@@ -84,7 +119,7 @@ const Page = async ({ params }: { params: Promise<{ idExam: string }> }) => {
 					</div>
 				</div>
 
-				<div className="grid grid-cols-2 gap-4 mt-4 md:grid-cols-4">
+				<div className="grid grid-cols-2 gap-4 mt-4 lg:grid-cols-5">
 					<div className="p-3 rounded-md bg-blue-50">
 						<p className="text-sm text-gray-600">Questions</p>
 						<p className="text-lg font-semibold text-blue-700">{questions.length}</p>
@@ -101,6 +136,10 @@ const Page = async ({ params }: { params: Promise<{ idExam: string }> }) => {
 						<p className="text-sm text-gray-600">Questions ouvertes</p>
 						<p className="text-lg font-semibold text-orange-700">{questions.filter((q) => !q.isQcm).length}</p>
 					</div>
+					<div className="p-3 rounded-md bg-indigo-50 col-span-2 lg:col-span-1">
+						<p className="text-sm text-gray-600">Matière</p>
+						<p className="text-lg font-semibold text-indigo-700">{matiere.nom}</p>
+					</div>
 				</div>
 			</div>
 
@@ -108,7 +147,7 @@ const Page = async ({ params }: { params: Promise<{ idExam: string }> }) => {
 			<div className="bg-white rounded-lg border border-gray-200">
 				<div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
 					<h2 className="text-xl font-bold text-gray-900">Classes assignées ({classesWithDegrees.length})</h2>
-					<AddClassToExam idExam={idExamNumber} existingClassIds={classes.map((c) => c.idClass)} idTeacher={session.user.idUser} />
+					<AddClassToExam idExam={idExamNumber} existingClassIds={classes.map((c) => c.idClass)} idTeacher={session.user.idUser} examTimeMinutes={exam.time} />
 				</div>
 				<div className="overflow-hidden rounded-md">
 					{classesWithDegrees.length === 0 ? (

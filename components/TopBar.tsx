@@ -28,10 +28,11 @@ const TopBar = ({ loggedUser }: { loggedUser: Session }) => {
 
 	const adminLinks = [
 		{ label: 'Dashboard', href: `/admin/dashboard` },
-		{ label: 'Élèces', href: '/admin/students' },
+		{ label: 'Élèves', href: '/admin/students' },
 		{ label: 'Classes', href: '/admin/classes' },
 		{ label: 'Professeurs', href: '/admin/teachers' },
 		{ label: 'Promotions', href: '/admin/degrees' },
+		{ label: 'Matières', href: '/admin/matieres' },
 	];
 
 	const selectedLinks = () => {

@@ -9,14 +9,15 @@ interface AddClassToExamProps {
 	idExam: number;
 	existingClassIds: number[];
 	idTeacher: number;
+	examTimeMinutes: number;
 }
 
-const AddClassToExam = ({ idExam, existingClassIds, idTeacher }: AddClassToExamProps) => {
+const AddClassToExam = ({ idExam, existingClassIds, idTeacher, examTimeMinutes }: AddClassToExamProps) => {
 	const { openModal } = useModal();
 
 	const handleOpenModal = () => {
 		openModal({
-			modalContent: <AddClassToExamModalContent idExam={idExam} existingClassIds={existingClassIds} idTeacher={idTeacher} />,
+			modalContent: <AddClassToExamModalContent idExam={idExam} existingClassIds={existingClassIds} idTeacher={idTeacher} examTimeMinutes={examTimeMinutes} />,
 			size: 'md',
 			scrollBehavior: 'inside',
 		});

@@ -1,14 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import { ExamWithAdditionalData } from '@/app/(protectedPages)/teacher/exams/page';
 import { DocumentTextIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
-import { ExamWithQuestionCount } from '@/app/(protectedPages)/teacher/exams/page';
+import { useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
 import ExamComp from './ExamComp';
 
-const FilterComp = ({ examsWithQuestionsData }: { examsWithQuestionsData: ExamWithQuestionCount[] }) => {
+const FilterComp = ({ examsWithAdditionalData }: { examsWithAdditionalData: ExamWithAdditionalData[] }) => {
 	const { data: session } = useSession();
-	const [examsWithQuestions, setExamsWithQuestions] = useState<any[]>([]);
+	const [ExamsWithAdditionalData, setExamsWithAdditionalData] = useState<any[]>([]);
 	const [filteredExams, setFilteredExams] = useState<any[]>([]);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [loading, setLoading] = useState(true);
@@ -17,8 +17,8 @@ const FilterComp = ({ examsWithQuestionsData }: { examsWithQuestionsData: ExamWi
 		const fetchExams = async () => {
 			if (!session?.user?.idUser) return;
 
-			setExamsWithQuestions(examsWithQuestionsData);
-			setFilteredExams(examsWithQuestionsData);
+			setExamsWithAdditionalData(examsWithAdditionalData);
+			setFilteredExams(examsWithAdditionalData);
 			setLoading(false);
 		};
 
@@ -27,12 +27,12 @@ const FilterComp = ({ examsWithQuestionsData }: { examsWithQuestionsData: ExamWi
 
 	useEffect(() => {
 		if (searchQuery.trim() === '') {
-			setFilteredExams(examsWithQuestions);
+			setFilteredExams(ExamsWithAdditionalData);
 		} else {
-			const filtered = examsWithQuestions.filter((exam) => exam.title.toLowerCase().includes(searchQuery.toLowerCase()));
+			const filtered = ExamsWithAdditionalData.filter((exam) => exam.title.toLowerCase().includes(searchQuery.toLowerCase()));
 			setFilteredExams(filtered);
 		}
-	}, [searchQuery, examsWithQuestions]);
+	}, [searchQuery, ExamsWithAdditionalData]);
 
 	if (loading) {
 		return (
@@ -46,7 +46,7 @@ const FilterComp = ({ examsWithQuestionsData }: { examsWithQuestionsData: ExamWi
 	}
 	return (
 		<div>
-			{examsWithQuestions.length === 0 ? (
+			{ExamsWithAdditionalData.length === 0 ? (
 				<div className="bg-white rounded-xl shadow-lg p-12 text-center">
 					<DocumentTextIcon className="w-20 h-20 text-gray-300 mx-auto mb-4" />
 					<h3 className="text-2xl font-semibold text-gray-900 mb-2">Aucun examen créé</h3>
@@ -59,7 +59,7 @@ const FilterComp = ({ examsWithQuestionsData }: { examsWithQuestionsData: ExamWi
 								<h1 className="text-2xl font-bold mb-1">Liste des examens</h1>
 								<p className="text-amber-100 text-sm">
 									{filteredExams.length} examen{filteredExams.length !== 1 ? 's' : ''}
-									{searchQuery && ` (sur ${examsWithQuestions.length})`}
+									{searchQuery && ` (sur ${ExamsWithAdditionalData.length})`}
 								</p>
 							</div>
 							<DocumentTextIcon className="w-12 h-12 opacity-80" />
