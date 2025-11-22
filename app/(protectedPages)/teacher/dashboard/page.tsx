@@ -1,14 +1,17 @@
 import { getAllClassesForOneTeacher } from '@/backend_requests/classes/getAllClassesForOneTeacher';
+import { getOneClass } from '@/backend_requests/classes/getOneClass';
 import { getClassDegree } from '@/backend_requests/degrees/getClassDegree';
+import { getActiveAndUpcomingExamsForTeacher } from '@/backend_requests/exams/getActiveAndUpcomingExamsForTeacher';
 import { getAllExamsForOneTeacher } from '@/backend_requests/exams/getAllExamsForOneTeacher';
+import BlockActiveExams from '@/components/teacher/BlockActiveExams';
 import BlockClass from '@/components/teacher/BlockClass';
 import BlockCreateExam from '@/components/teacher/BlockCreateExam';
 import BlockExam from '@/components/teacher/BlockExam';
-import { Class, Degree } from '@/types/entitties';
+import { Class, Exam, ExamClass } from '@/types/entitties';
 import { auth } from '@/utils/auth';
 
-export type ClassWithDegree = Class & {
-	degree: Degree;
+export type ExamWithExtendedClassDates = Exam & {
+	examClasses: (ExamClass & { classe: Class })[];
 };
 
 const Page = async () => {
@@ -26,6 +29,57 @@ const Page = async () => {
 	const allExams = examsResponse.data;
 	const sortedExams = allExams.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 	const recentExams = sortedExams.slice(0, 5);
+
+	// Récupérer les examens actifs et à venir
+	const activeExamsResponse = await getActiveAndUpcomingExamsForTeacher(idTeacher, 5);
+	const activeExams = 'success' in activeExamsResponse && activeExamsResponse.success ? activeExamsResponse.data : [];
+
+	// Créer les examens actifs avec détails
+	const activeExamIds = [...new Set(activeExams.map((a) => a.idExam))];
+	const activeExamsWithDetails = (await Promise.all(
+		activeExamIds
+			.map(async (idExam) => {
+				const exam = allExams.find((e) => e.idExam === idExam);
+				if (!exam) return null;
+				const examClassesRaw = activeExams.filter((a) => a.idExam === idExam);
+				const examClasses = await Promise.all(
+					examClassesRaw.map(async (ec) => {
+						const classe = await getOneClass(ec.idClass);
+						if (!('success' in classe)) return ec; // fallback
+						return { ...ec, classe: classe.data };
+					})
+				);
+				return { ...exam, examClasses };
+			})
+			.filter(Boolean)
+	)) as ExamWithExtendedClassDates[];
+
+	console.log('activeExams', activeExams);
+
+	const recentExamsWithClasses = await Promise.all(
+		recentExams.map(async (exam) => {
+			const activeExamsForThisExam = activeExams.filter((a) => a.idExam === exam.idExam);
+			const activeExamsExtended = await Promise.all(
+				activeExamsForThisExam.map(async (ec) => {
+					const classe = await getOneClass(ec.idClass);
+					if (!('success' in classe)) {
+						throw new Error('Erreur lors de la récupération de la classe');
+					}
+					return {
+						...ec,
+						classe: classe.data,
+					};
+				})
+			);
+			return {
+				...exam,
+				activeExamsExtended: [activeExamsExtended],
+			};
+		})
+	);
+
+	console.log('activeExams', activeExams);
+	console.log('recentExamsWithClasses', recentExamsWithClasses);
 
 	const classesWithDegrees = await Promise.all(
 		classes.map(async (classe) => {
@@ -53,6 +107,9 @@ const Page = async () => {
 					<BlockClass classesWithDegrees={classesWithDegrees} />
 					<BlockCreateExam />
 					<BlockExam recentExams={recentExams} />
+				</div>
+				<div className="mt-6">
+					<BlockActiveExams activeExams={activeExamsWithDetails} />
 				</div>
 			</div>
 		</div>
