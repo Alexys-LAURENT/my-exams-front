@@ -1,5 +1,5 @@
 'use client';
-import { Exam, ExamClass, ExamGrade, User } from '@/types/entitties';
+import { Exam, ExamClass, ExamGrade, Matiere, User } from '@/types/entitties';
 import { EyeIcon } from '@heroicons/react/24/outline';
 import { Avatar } from '@heroui/avatar';
 import { Button } from '@heroui/button';
@@ -12,6 +12,7 @@ type ExamsWithExamGradeInfosAndTeacherInfos = Exam & {
 	examGradeInfo: ExamGrade | null;
 	teacherInfo: User;
 	classAssignment: ExamClass;
+	subjectInfo: Matiere;
 };
 
 interface StudentExamGradesTableProps {
@@ -23,6 +24,7 @@ interface StudentExamGradesTableProps {
 export const columns = [
 	{ name: 'Examen', uid: 'exam.title' },
 	{ name: 'Professeur', uid: 'teacher' },
+	{ name: 'Matière', uid: 'subject' },
 	{ name: 'Affectation', uid: 'assignement' },
 	{ name: 'Réalisé le', uid: 'did_at' },
 	{ name: 'Corrigé le', uid: 'corrected_at' },
@@ -60,6 +62,8 @@ const StudentPassedExamsTable = ({ exams, idClass, idStudent }: StudentExamGrade
 							{exam.teacherInfo.name} {exam.teacherInfo.lastName}
 						</div>
 					);
+				case 'subject':
+					return exam.subjectInfo.nom;
 				case 'grade':
 					if (!exam.examGradeInfo || exam.examGradeInfo.note === null) {
 						return (

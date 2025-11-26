@@ -1,9 +1,10 @@
 import { getAllExamsForOneTeacher } from '@/backend_requests/exams/getAllExamsForOneTeacher';
 import { getOneMatiere } from '@/backend_requests/matieres/getOneMatiere';
 import { getQuestionsCountForOneExam } from '@/backend_requests/questions/getQuestionsCountForOneExam';
-import FilterComp from '@/components/TeacherExamPage/FilterComp';
+import ExamsWrapper from '@/components/TeacherExamPage/ExamsWrapper';
 import { Exam } from '@/types/entitties';
 import { auth } from '@/utils/auth';
+import { DocumentTextIcon } from '@heroicons/react/24/outline';
 
 export type ExamWithAdditionalData = Exam & {
 	questionsCount: number;
@@ -43,14 +44,27 @@ const Page = async () => {
 	);
 
 	return (
-		<div className="min-h-screen from-blue-50 to-indigo-100 p-6">
-			<div className="max-w-7xl mx-auto">
-				<div className="mb-8">
-					<h1 className="text-4xl font-bold text-gray-900 mb-2">Mes Examens</h1>
-					<p className="text-gray-600">Gérez et consultez tous vos examens</p>
+		<div className="flex flex-col gap-8 p-6 pb-0">
+			{/* Header avec bandeau bleu */}
+			<div className="bg-gradient-to-br from-blue-700 to-blue-900 rounded-xl p-6">
+				<div className="flex items-center justify-between text-white">
+					<div>
+						<h1 className="text-4xl font-bold mb-2">Mes Examens</h1>
+						<p className="text-blue-100">Gérez et consultez tous vos examens</p>
+					</div>
+					<DocumentTextIcon className="w-16 h-16 opacity-80" />
 				</div>
-				<FilterComp examsWithAdditionalData={examsWithAdditionalData} />
 			</div>
+
+			{exams.length === 0 ? (
+				<div className="bg-white rounded-xl p-12 text-center">
+					<DocumentTextIcon className="w-20 h-20 text-gray-300 mx-auto mb-4" />
+					<h3 className="text-2xl font-semibold text-gray-900 mb-2">Aucun examen créé</h3>
+					<p className="text-gray-500">Vous n&apos;avez pas encore créé d&apos;examens</p>
+				</div>
+			) : (
+				<ExamsWrapper examsWithAdditionalData={examsWithAdditionalData} />
+			)}
 		</div>
 	);
 };

@@ -21,7 +21,6 @@ const Page = async ({ params, searchParams }: PageProps) => {
 	if (!['pending', 'completed', 'comming'].includes(Array.isArray(status) ? status[0] : status || 'pending')) {
 		redirect(`/student/${idClass}/exams?status=pending`);
 	}
-	console.log(status);
 
 	const idClassNumber = parseInt(idClass);
 

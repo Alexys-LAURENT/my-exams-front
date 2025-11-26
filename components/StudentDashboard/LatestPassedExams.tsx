@@ -1,6 +1,7 @@
 import { getExamGradeOneStudent } from '@/backend_requests/exam_grades/getExamGradeOneStudent';
 import { getExamsByTypeOfStudentInClass } from '@/backend_requests/exams/getExamsByTypeOfStudentInClass';
 import { getExamClass } from '@/backend_requests/exams_classes/getExamClass';
+import { getOneMatiere } from '@/backend_requests/matieres/getOneMatiere';
 import { getOneTeacher } from '@/backend_requests/teachers/getOneTeacher';
 import { DASHBOARD_LIMITS } from '@/constants/dashboardLimits';
 import StudentPassedExamsTable from '../StudentPassedExamsTable';
@@ -35,11 +36,17 @@ const LatestPassedExams = async ({ idClass, idStudent }: LatestExamGradesProps) 
 				throw new Error("Erreur lors de la récupération des informations de l'affectation de l'examen à la classe");
 			}
 
+			const SubjectResponse = await getOneMatiere(eg.idMatiere);
+			if (!('success' in SubjectResponse)) {
+				throw new Error('Erreur lors de la récupération des informations de la matière');
+			}
+
 			return {
 				...eg,
 				examGradeInfo: 'data' in examGradeInfosResponse ? examGradeInfosResponse.data : null,
 				teacherInfo: teachInfosResponse.data,
 				classAssignment: classAssignment.data,
+				subjectInfo: SubjectResponse.data,
 			};
 		})
 	);

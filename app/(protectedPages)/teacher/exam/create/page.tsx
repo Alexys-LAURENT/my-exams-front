@@ -52,7 +52,6 @@ const Page = () => {
 		async function fetchMatieres() {
 			if (session?.user?.idUser) {
 				const res = await getTeacherMatieres(session.user.idUser);
-				console.log('Fetched matieres:', res);
 				if (res && !('error' in res)) {
 					setMatieres(res.data);
 				}

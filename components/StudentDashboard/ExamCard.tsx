@@ -1,8 +1,9 @@
 import { getExamClass } from '@/backend_requests/exams_classes/getExamClass';
+import { getOneMatiere } from '@/backend_requests/matieres/getOneMatiere';
 import { getQuestionsCountForOneExam } from '@/backend_requests/questions/getQuestionsCountForOneExam';
 import { getOneTeacher } from '@/backend_requests/teachers/getOneTeacher';
 import { ExamWithDates } from '@/types/entitties';
-import { CalendarIcon, UserIcon } from '@heroicons/react/24/outline';
+import { CalendarIcon, ClipboardDocumentListIcon, UserIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
 // Couleurs de gradient pour les cartes
@@ -48,11 +49,17 @@ const ExamCard = async ({ exam, idClass, idStudent }: ExamCardProps) => {
 		throw new Error("Erreur lors de la récupération du nombre de questions de l'examen");
 	}
 
+	const SubjectResponse = await getOneMatiere(exam.idMatiere);
+	if (!('success' in SubjectResponse)) {
+		throw new Error('Erreur lors de la récupération des informations de la matière');
+	}
+
 	const todoExamsWithDetails = {
 		...exam,
 		teacherInfo: teachInfosResponse.data,
 		classAssignment: classAssignment.data,
 		questionsCount: Number.parseInt(totalQuestionsReponse.data),
+		subjectInfo: SubjectResponse.data,
 	};
 	const gradient = gradients[exam.idExam % gradients.length];
 
@@ -74,10 +81,17 @@ const ExamCard = async ({ exam, idClass, idStudent }: ExamCardProps) => {
 
 					{/* Infos supplémentaires */}
 					<div className="flex flex-col gap-2">
-						<span className="flex w-fit items-center  bg-slate-100 text-slate-500 py-1 px-2 rounded-full text-[11px]">
-							<UserIcon className="w-4 h-4 inline-block mr-1" />
-							{todoExamsWithDetails.teacherInfo.name} {todoExamsWithDetails.teacherInfo.lastName}
-						</span>
+						<div className="flex items-center gap-2">
+							<span className="flex w-fit items-center  bg-slate-100 text-slate-500 py-1 px-2 rounded-full text-[11px]">
+								<UserIcon className="w-4 h-4 inline-block mr-1" />
+								{todoExamsWithDetails.teacherInfo.name} {todoExamsWithDetails.teacherInfo.lastName}
+							</span>
+
+							<span className="flex w-fit items-center  bg-slate-100 text-slate-500 py-1 px-2 rounded-full text-[11px]">
+								<ClipboardDocumentListIcon className="w-4 h-4 inline-block mr-1" />
+								{todoExamsWithDetails.subjectInfo.nom}
+							</span>
+						</div>
 
 						<span className="w-fit flex items-center bg-slate-100 text-slate-500 py-1 px-2 rounded-full text-[11px]">
 							<CalendarIcon className="w-4 h-4 inline-block mr-1" />
