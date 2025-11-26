@@ -73,7 +73,10 @@ const page = async ({ params }: { params: Promise<{ idClass: string }> }) => {
 				</div>
 
 				{/* Grande carte Moyenne Générale à droite - prend 2 lignes */}
-				<div className="bg-gradient-to-br from-blue-700 to-blue-900 rounded-xl p-6 shadow-lg flex flex-col justify-center items-center text-white lg:row-span-2">
+				<Link
+					href={`/student/${idClass}/${idStudent}/grades-summary`}
+					className="bg-gradient-to-br from-blue-700 to-blue-900 rounded-xl p-6 shadow-lg flex flex-col justify-center items-center text-white lg:row-span-2"
+				>
 					<div className="text-center">
 						<h2 className="text-lg font-semibold mb-2 opacity-90">Moyenne Générale</h2>
 						<div className="my-6">
@@ -85,10 +88,10 @@ const page = async ({ params }: { params: Promise<{ idClass: string }> }) => {
 							<p className="text-xs opacity-70 mt-1">{degreeName}</p>
 						</div>
 					</div>
-				</div>
+				</Link>
 
 				{/* Trois petites cartes statistiques */}
-				<div className="grid grid-cols-3 gap-4">
+				<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 					<Link href={`/student/${idClass}/exams?status=pending`} className="bg-white hover:bg-slate-50 rounded-xl p-4 ">
 						<div className="flex items-center gap-2 mb-2">
 							<div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">

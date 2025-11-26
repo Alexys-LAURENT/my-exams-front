@@ -51,33 +51,39 @@ const Page = async ({ params, searchParams }: PageProps) => {
 
 	return (
 		<div className="p-6">
-			{/* Header */}
-			<h1 className="text-4xl font-bold text-gray-900 mb-2">Mes Examens</h1>
+			<div className="bg-gradient-to-br from-blue-700 to-blue-900 p-4 rounded-xl ">
+				{/* Header */}
+				<h1 className="text-4xl font-bold text-white mb-2">Mes Examens</h1>
 
-			<div className="w-full h-[1px] bg-black/10 my-4"></div>
+				<div className="w-full h-[1px] bg-white/10 my-4"></div>
 
-			<Link
-				href={`/student/${idClass}/exams?status=pending`}
-				className={`font-semibold inline-flex items-center gap-2 px-4 py-2 border-b-2 ${status === 'pending' ? ' text-blue-700 border-blue-300' : ' hover:text-blue-700 !border-0'} mr-2 mb-2`}
-			>
-				Examens à faire ({totalTodoExams})
-			</Link>
+				<Link
+					href={`/student/${idClass}/exams?status=pending`}
+					className={`font-semibold inline-flex items-center gap-2 px-4 py-2 border-b-2 ${
+						status === 'pending' ? '  border-blue-300' : ' hover:text-slate-200 !border-0'
+					} text-white mr-2 mb-2`}
+				>
+					Examens à faire ({totalTodoExams})
+				</Link>
 
-			<Link
-				href={`/student/${idClass}/exams?status=completed`}
-				className={`font-semibold inline-flex items-center gap-2 px-4 py-2 border-b-2 ${
-					status === 'completed' ? ' text-blue-700 border-blue-300' : ' hover:text-blue-700 !border-0'
-				} mr-2 mb-2`}
-			>
-				Examens terminés ({totalPassedExams})
-			</Link>
+				<Link
+					href={`/student/${idClass}/exams?status=completed`}
+					className={`font-semibold inline-flex items-center gap-2 px-4 py-2 border-b-2 ${
+						status === 'completed' ? '  border-blue-300' : ' hover:text-slate-200 !border-0'
+					} text-white mr-2 mb-2`}
+				>
+					Examens terminés ({totalPassedExams})
+				</Link>
 
-			<Link
-				href={`/student/${idClass}/exams?status=comming`}
-				className={`font-semibold inline-flex items-center gap-2 px-4 py-2 border-b-2 ${status === 'comming' ? ' text-blue-700 border-blue-300' : ' hover:text-blue-700 !border-0'} mr-2 mb-2`}
-			>
-				Examens à venir ({totalCommingExams})
-			</Link>
+				<Link
+					href={`/student/${idClass}/exams?status=comming`}
+					className={`font-semibold inline-flex items-center gap-2 px-4 py-2 border-b-2 ${
+						status === 'comming' ? '  border-blue-300' : ' hover:text-slate-200 !border-0'
+					} text-white mr-2 mb-2`}
+				>
+					Examens à venir ({totalCommingExams})
+				</Link>
+			</div>
 
 			<div className="flex w-full items-center gap-4 mt-6 flex-wrap">
 				{examsReponse.data.length === 0 ? (

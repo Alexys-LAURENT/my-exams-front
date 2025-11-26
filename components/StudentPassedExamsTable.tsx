@@ -50,7 +50,13 @@ const StudentPassedExamsTable = ({ exams, idClass, idStudent }: StudentExamGrade
 				case 'teacher':
 					return (
 						<div className="flex items-center">
-							<Avatar size="sm" src={exam.teacherInfo.avatarPath} alt={`${exam.teacherInfo.name} ${exam.teacherInfo.lastName}`} className="mr-2" />
+							<Avatar
+								size="sm"
+								src={exam.teacherInfo.avatarPath}
+								alt={`${exam.teacherInfo.name} ${exam.teacherInfo.lastName}`}
+								name={`${exam.teacherInfo.name} ${exam.teacherInfo.lastName}`}
+								className="mr-2"
+							/>
 							{exam.teacherInfo.name} {exam.teacherInfo.lastName}
 						</div>
 					);

@@ -66,11 +66,11 @@ const page = async () => {
 	);
 
 	return (
-		<div className="min-h-screen  p-6">
+		<div className="p-6">
 			<div className="max-w-6xl mx-auto">
-				<div className="mb-8">
-					<h1 className="text-4xl font-bold text-gray-900 mb-2">Mes Classes</h1>
-					<p className="text-gray-600">Découvrez vos formations et leurs périodes de validité</p>
+				<div className="mb-8 bg-gradient-to-br from-blue-700 to-blue-900 p-4 rounded-xl ">
+					<h1 className="text-4xl font-bold text-white mb-2">Mes Classes</h1>
+					<p className="text-white/70">Découvrez vos formations et leurs périodes de validité</p>
 				</div>
 
 				{classesWithDegrees.length === 0 ? (
@@ -92,7 +92,7 @@ const page = async () => {
 									className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
 								>
 									{/* Header avec statut */}
-									<div className={`h-2 ${isActive ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+									<div className={`h-2 ${isActive ? 'bg-blue-500' : 'bg-gray-300'}`}></div>
 
 									<div className="p-6">
 										{/* Titre du diplôme */}
@@ -103,7 +103,7 @@ const page = async () => {
 												</h3>
 												<span
 													className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-														isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+														isActive ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
 													}`}
 												>
 													{isActive ? 'En cours' : 'Terminée'}

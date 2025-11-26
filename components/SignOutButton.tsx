@@ -6,10 +6,13 @@ import { signOut } from 'next-auth/react';
 const SignOutButton = () => {
 	return (
 		<Button
+			size="sm"
+			color="danger"
+			variant="light"
 			onPress={() => {
 				signOut();
 			}}
-			className="mt-2"
+			className="w-full"
 		>
 			Déconnexion
 		</Button>
