@@ -1,6 +1,8 @@
 import { ApiError, SuccessResponse } from '@/types/requests';
 import { fetchApi } from '@/utils/fetchApi';
 
+//TODO : implement
+
 /**
  * Question la plus échouée avec son taux d'échec
  */
@@ -15,7 +17,5 @@ export type MostFailedQuestionResponse = {
  * @returns Un tableau des 5 questions avec leur taux d'échec (max 5)
  */
 export const getMostFailedQuestions = async (idExam: number) => {
-	return (await fetchApi(`/api/stats/exams/${idExam}/most_failed_questions`)) as
-		| ApiError
-		| SuccessResponse<MostFailedQuestionResponse[]>;
+	return (await fetchApi(`/api/stats/exams/${idExam}/most_failed_questions`)) as ApiError | SuccessResponse<MostFailedQuestionResponse[]>;
 };

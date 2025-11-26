@@ -1,6 +1,8 @@
 import { ApiError, SuccessResponse } from '@/types/requests';
 import { fetchApi } from '@/utils/fetchApi';
 
+//TODO : implement
+
 /**
  * Taux de participation d'un élève aux examens
  */
@@ -16,7 +18,5 @@ export type AverageParticipationRateResponse = {
  * @returns Un tableau avec le taux de participation de chaque élève
  */
 export const getAverageParticipationRate = async (idTeacher: number, idClass: number) => {
-	return (await fetchApi(`/api/stats/teachers/${idTeacher}/classes/${idClass}/average_participation_rate`)) as
-		| ApiError
-		| SuccessResponse<AverageParticipationRateResponse[]>;
+	return (await fetchApi(`/api/stats/teachers/${idTeacher}/classes/${idClass}/average_participation_rate`)) as ApiError | SuccessResponse<AverageParticipationRateResponse[]>;
 };
