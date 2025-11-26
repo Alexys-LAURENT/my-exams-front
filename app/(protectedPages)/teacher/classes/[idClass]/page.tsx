@@ -3,6 +3,7 @@ import { getClassDegree } from '@/backend_requests/degrees/getClassDegree';
 import { getExamsOfClass } from '@/backend_requests/exams/getExamsOfClass';
 import { getStudentsOfClass } from '@/backend_requests/students/getStudentsOfClass';
 import ExamRelationClassCard from '@/components/TeacherClassByIdPage/ExamRelationClassCard';
+import StudentsTable from '@/components/TeacherClassByIdPage/StudentsTable';
 import { auth } from '@/utils/auth';
 import formatDateWithShortMonth from '@/utils/formatDateWithShortMonth';
 import { AcademicCapIcon, ArrowLeftIcon, CalendarIcon, DocumentTextIcon, UsersIcon } from '@heroicons/react/24/outline';
@@ -78,24 +79,7 @@ const Page = async ({ params }: { params: Promise<{ idClass: string }> }) => {
 					</div>
 				) : (
 					<div className="overflow-x-auto">
-						<table className="w-full">
-							<thead>
-								<tr className="border-b border-gray-200">
-									<th className="text-left py-3 px-4 font-semibold text-gray-700">Nom</th>
-									<th className="text-left py-3 px-4 font-semibold text-gray-700">Prénom</th>
-									<th className="text-left py-3 px-4 font-semibold text-gray-700">Email</th>
-								</tr>
-							</thead>
-							<tbody>
-								{students.map((student, index) => (
-									<tr key={student.idUser} className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-										<td className="py-3 px-4 text-gray-900">{student.lastName}</td>
-										<td className="py-3 px-4 text-gray-900">{student.name}</td>
-										<td className="py-3 px-4 text-gray-600">{student.email}</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
+						<StudentsTable students={students} idClass={idClass} />
 					</div>
 				)}
 			</div>

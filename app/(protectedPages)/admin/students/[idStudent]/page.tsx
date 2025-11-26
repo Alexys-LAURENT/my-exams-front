@@ -144,11 +144,13 @@ const Page = async ({ params }: PageProps) => {
 											<td className="py-4 px-4 text-sm text-gray-600">{formatDate(classe.startDate)}</td>
 											<td className="py-4 px-4 text-sm text-gray-600">{formatDate(classe.endDate)}</td>
 											<td className="py-4 px-4 text-sm font-semibold text-gray-900">
-												{classe.average !== null ? (
-													<span className={classe.average >= 10 ? 'text-green-600' : 'text-red-600'}>{classe.average.toFixed(2)}/20</span>
-												) : (
-													<span className="text-gray-400">N/A</span>
-												)}
+												<Link href={`/student/${classe.idClass}/${student.idUser}/grades-summary`}>
+													{classe.average !== null ? (
+														<span className={classe.average >= 10 ? 'text-green-600' : 'text-red-600'}>{classe.average.toFixed(2)}/20</span>
+													) : (
+														<span className="text-gray-400">N/A</span>
+													)}
+												</Link>
 											</td>
 											<td className="py-4 px-4 text-right">
 												<RemoveStudentFromClassButton idClass={classe.idClass} idStudent={idStudentNumber} className={classe.name} />
