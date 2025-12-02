@@ -1,21 +1,27 @@
 import { getAllClasses } from '@/backend_requests/classes/getAllClasses';
 import { getAllDegrees } from '@/backend_requests/degrees/getAllDegrees';
 import { getAllMatieres } from '@/backend_requests/matieres/getAllMatieres';
-import { getAllStudents } from '@/backend_requests/students/getAllStudents';
-import { getAllTeachers } from '@/backend_requests/teachers/getAllTeachers';
+import { getAllStudentsCount } from '@/backend_requests/students/getAllStudentsCount';
+import { getAllTeachersCount } from '@/backend_requests/teachers/getAllTeachersCount';
 import Link from 'next/link';
 
 const AdminDashboard = async () => {
 	// Récupérer les données pour les counts
-	const [studentsData, teachersData, classesData, degreesData, matieresData] = await Promise.all([getAllStudents(), getAllTeachers(), getAllClasses(), getAllDegrees(), getAllMatieres()]);
+	const [studentsCountData, teachersCountData, classesData, degreesData, matieresData] = await Promise.all([
+		getAllStudentsCount(),
+		getAllTeachersCount(),
+		getAllClasses(),
+		getAllDegrees(),
+		getAllMatieres(),
+	]);
 
-	if (!('success' in studentsData) || !('success' in teachersData) || !('success' in classesData) || !('success' in degreesData) || !('success' in matieresData)) {
+	if (!('success' in studentsCountData) || !('success' in teachersCountData) || !('success' in classesData) || !('success' in degreesData) || !('success' in matieresData)) {
 		throw new Error('Error fetching data');
 	}
 
 	// Extraire les counts
-	const studentsCount = studentsData.data.length;
-	const teachersCount = teachersData.data.length;
+	const studentsCount = studentsCountData.data;
+	const teachersCount = teachersCountData.data;
 	const classesCount = classesData.data.length;
 	const degreesCount = degreesData.data.length;
 	const matieresCount = matieresData.data.length;

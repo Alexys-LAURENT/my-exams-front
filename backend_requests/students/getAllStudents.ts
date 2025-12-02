@@ -1,7 +1,13 @@
 import { User } from '@/types/entitties';
-import { ApiError, SuccessResponse } from '@/types/requests';
+import { ApiError, PaginatedResponse } from '@/types/requests';
 import { fetchApi } from '@/utils/fetchApi';
 
-export const getAllStudents = async () => {
-	return (await fetchApi('/api/students')) as ApiError | SuccessResponse<User[]>;
+export const getAllStudents = async (page: number, filter?: string) => {
+	const queryParams = new URLSearchParams();
+
+	queryParams.append('page', page.toString());
+	if (filter) {
+		queryParams.append('filter', filter);
+	}
+	return (await fetchApi('/api/students?' + queryParams.toString(), { method: 'GET' })) as ApiError | PaginatedResponse<User[]>;
 };

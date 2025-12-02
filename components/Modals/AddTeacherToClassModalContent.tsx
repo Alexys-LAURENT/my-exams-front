@@ -1,6 +1,6 @@
 'use client';
-import { putStudentToClass } from '@/backend_requests/classes/putStudentToClass';
-import { getAllStudents } from '@/backend_requests/students/getAllStudents';
+import { putTeacherToClass } from '@/backend_requests/classes/putTeacherToClass';
+import { getAllTeachers } from '@/backend_requests/teachers/getAllTeachers';
 import { ModalContext } from '@/Context/ModalContext';
 import { ToastContext } from '@/Context/ToastContext';
 import { User } from '@/types/entitties';
@@ -12,56 +12,56 @@ import { ModalBody, ModalFooter, ModalHeader } from '@heroui/modal';
 import { useRouter } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
 
-interface AddStudentToClassModalContentProps {
+interface AddTeacherToClassModalContentProps {
 	idClass: number;
-	existingStudentIds: number[];
+	existingTeacherIds: number[];
 }
 
-const AddStudentToClassModalContent = ({ idClass, existingStudentIds }: AddStudentToClassModalContentProps) => {
+const AddTeacherToClassModalContent = ({ idClass, existingTeacherIds }: AddTeacherToClassModalContentProps) => {
 	const { customToast } = useContext(ToastContext);
 	const { closeModal } = useContext(ModalContext);
 	const router = useRouter();
-	const [selectedStudents, setSelectedStudents] = useState<User[]>([]);
-	const [students, setStudents] = useState<User[]>([]);
+	const [selectedTeachers, setSelectedTeachers] = useState<User[]>([]);
+	const [teachers, setTeachers] = useState<User[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [isSearching, setIsSearching] = useState(false);
 	const [searchValue, setSearchValue] = useState('');
 
-	const loadStudents = async (filter?: string) => {
+	const loadTeachers = async (filter?: string) => {
 		try {
 			setIsSearching(true);
-			const res = await getAllStudents(1, filter);
+			const res = await getAllTeachers(1, filter);
 			if ('success' in res) {
-				// Filtrer les étudiants déjà dans la classe et ceux déjà sélectionnés
-				const selectedIds = selectedStudents.map((s) => s.idUser);
-				const availableStudents = res.data.data.filter((student) => !existingStudentIds.includes(student.idUser) && !selectedIds.includes(student.idUser));
-				setStudents(availableStudents);
+				// Filtrer les professeurs déjà dans la classe et ceux déjà sélectionnés
+				const selectedIds = selectedTeachers.map((t) => t.idUser);
+				const availableTeachers = res.data.data.filter((teacher) => !existingTeacherIds.includes(teacher.idUser) && !selectedIds.includes(teacher.idUser));
+				setTeachers(availableTeachers);
 			} else {
-				console.error('AddStudentToClassModalContent:Error::', 'message' in res ? res.message : 'Unknown error');
-				throw new Error('Erreur lors de la récupération des étudiants');
+				console.error('AddTeacherToClassModalContent:Error::', 'message' in res ? res.message : 'Unknown error');
+				throw new Error('Erreur lors de la récupération des professeurs');
 			}
 		} catch {
-			customToast.error('Erreur lors de la récupération des étudiants');
+			customToast.error('Erreur lors de la récupération des professeurs');
 		} finally {
 			setIsSearching(false);
 		}
 	};
 
 	useEffect(() => {
-		loadStudents();
+		loadTeachers();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [selectedStudents]);
+	}, [selectedTeachers]);
 
 	const handleSubmit = async () => {
 		try {
-			if (selectedStudents.length === 0) {
-				customToast.error('Veuillez sélectionner au moins un étudiant');
+			if (selectedTeachers.length === 0) {
+				customToast.error('Veuillez sélectionner au moins un professeur');
 				return;
 			}
 			setIsLoading(true);
 
-			// Ajouter tous les étudiants sélectionnés
-			const promises = selectedStudents.map((student) => putStudentToClass(idClass, student.idUser));
+			// Ajouter tous les professeurs sélectionnés
+			const promises = selectedTeachers.map((teacher) => putTeacherToClass(idClass, teacher.idUser));
 
 			const results = await Promise.all(promises);
 
@@ -69,15 +69,15 @@ const AddStudentToClassModalContent = ({ idClass, existingStudentIds }: AddStude
 			const allSuccess = results.every((res) => 'success' in res && res.success);
 
 			if (!allSuccess) {
-				return customToast.error("Erreur lors de l'ajout de certains étudiants");
+				return customToast.error("Erreur lors de l'ajout de certains professeurs");
 			} else {
 				closeModal();
-				customToast.success(selectedStudents.length > 1 ? `${selectedStudents.length} étudiants ajoutés avec succès` : 'Étudiant ajouté avec succès');
+				customToast.success(selectedTeachers.length > 1 ? `${selectedTeachers.length} professeurs ajoutés avec succès` : 'Professeur ajouté avec succès');
 				return router.refresh();
 			}
 		} catch (error) {
 			console.error(error);
-			customToast.error("Erreur lors de l'ajout des étudiants");
+			customToast.error("Erreur lors de l'ajout des professeurs");
 		} finally {
 			setIsLoading(false);
 		}
@@ -85,38 +85,38 @@ const AddStudentToClassModalContent = ({ idClass, existingStudentIds }: AddStude
 
 	const handleSelectionChange = (key: string | number | null) => {
 		if (key) {
-			const student = students.find((s) => s.idUser.toString() === key.toString());
-			if (student && !selectedStudents.find((s) => s.idUser === student.idUser)) {
-				setSelectedStudents([...selectedStudents, student]);
+			const teacher = teachers.find((t) => t.idUser.toString() === key.toString());
+			if (teacher && !selectedTeachers.find((t) => t.idUser === teacher.idUser)) {
+				setSelectedTeachers([...selectedTeachers, teacher]);
 				setSearchValue('');
 			}
 		}
 	};
 
-	const removeStudent = (idUser: number) => {
-		setSelectedStudents(selectedStudents.filter((s) => s.idUser !== idUser));
+	const removeTeacher = (idUser: number) => {
+		setSelectedTeachers(selectedTeachers.filter((t) => t.idUser !== idUser));
 	};
 
 	return (
 		<>
 			<ModalHeader className="flex flex-col gap-1">
-				<div>Ajouter des étudiants à la classe</div>
+				<div>Ajouter des professeurs à la classe</div>
 			</ModalHeader>
 			<ModalBody className="pb-3 !pt-0 px-6 ">
 				<form className="flex flex-col gap-2">
 					<div className="flex flex-col pt-2 gap-3">
-						{/* Afficher les étudiants sélectionnés */}
-						{selectedStudents.length > 0 && (
+						{/* Afficher les professeurs sélectionnés */}
+						{selectedTeachers.length > 0 && (
 							<div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-lg">
-								{selectedStudents.map((student) => (
+								{selectedTeachers.map((teacher) => (
 									<Chip
-										key={student.idUser}
-										onClose={() => removeStudent(student.idUser)}
+										key={teacher.idUser}
+										onClose={() => removeTeacher(teacher.idUser)}
 										variant="flat"
 										color="primary"
-										avatar={<Avatar name={student.name} src={student.avatarPath || undefined} />}
+										avatar={<Avatar name={teacher.name} src={teacher.avatarPath || undefined} />}
 									>
-										{student.name} {student.lastName}
+										{teacher.name} {teacher.lastName}
 									</Chip>
 								))}
 							</div>
@@ -125,23 +125,23 @@ const AddStudentToClassModalContent = ({ idClass, existingStudentIds }: AddStude
 						<Autocomplete
 							label={
 								<>
-									{'Rechercher et ajouter des étudiants'}
+									{'Rechercher et ajouter des professeurs'}
 									<span className="text-red-500">*</span>
 								</>
 							}
 							labelPlacement="outside"
-							placeholder="Rechercher un étudiant..."
+							placeholder="Rechercher un professeur..."
 							inputValue={searchValue}
 							onInputChange={(value) => {
 								setSearchValue(value);
-								loadStudents(value);
+								loadTeachers(value);
 							}}
 							onSelectionChange={handleSelectionChange}
 							isLoading={isSearching}
-							items={students}
+							items={teachers}
 							allowsCustomValue={false}
 							listboxProps={{
-								emptyContent: searchValue ? 'Aucun étudiant trouvé' : 'Commencez à taper pour rechercher',
+								emptyContent: searchValue ? 'Aucun professeur trouvé' : 'Commencez à taper pour rechercher',
 							}}
 							className="!bg-bg_light_secondary dark:!bg-bg_dark_secondary !border-none"
 						>
@@ -160,8 +160,8 @@ const AddStudentToClassModalContent = ({ idClass, existingStudentIds }: AddStude
 							)}
 						</Autocomplete>
 					</div>
-					{selectedStudents.length === 0 && students.length === 0 && !isSearching && searchValue === '' && (
-						<p className="text-sm text-gray-500">Tous les étudiants sont déjà dans cette classe</p>
+					{selectedTeachers.length === 0 && teachers.length === 0 && !isSearching && searchValue === '' && (
+						<p className="text-sm text-gray-500">Tous les professeurs sont déjà dans cette classe</p>
 					)}
 				</form>
 			</ModalBody>
@@ -169,12 +169,12 @@ const AddStudentToClassModalContent = ({ idClass, existingStudentIds }: AddStude
 				<Button size="sm" onPress={() => closeModal()} variant="flat" className="mr-2 bg-neutral-200 dark:bg-neutral-800 text-default-500 dark:text-white">
 					Annuler
 				</Button>
-				<Button size="sm" className="bg-blue-500 text-white font-semibold" isLoading={isLoading} onPress={() => handleSubmit()} isDisabled={selectedStudents.length === 0}>
-					Ajouter {selectedStudents.length > 0 ? `(${selectedStudents.length})` : ''}
+				<Button size="sm" className="bg-blue-500 text-white font-semibold" isLoading={isLoading} onPress={() => handleSubmit()} isDisabled={selectedTeachers.length === 0}>
+					Ajouter {selectedTeachers.length > 0 ? `(${selectedTeachers.length})` : ''}
 				</Button>
 			</ModalFooter>
 		</>
 	);
 };
 
-export default AddStudentToClassModalContent;
+export default AddTeacherToClassModalContent;

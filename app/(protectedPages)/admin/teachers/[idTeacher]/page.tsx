@@ -1,7 +1,7 @@
 import { getAllClassesForOneTeacher } from '@/backend_requests/classes/getAllClassesForOneTeacher';
 import { getClassDegree } from '@/backend_requests/degrees/getClassDegree';
 import { getTeacherMatieres } from '@/backend_requests/matieres/getTeacherMatieres';
-import { getAllTeachers } from '@/backend_requests/teachers/getAllTeachers';
+import { getOneTeacher } from '@/backend_requests/teachers/getOneTeacher';
 import { RemoveTeacherFromClassButton, RemoveTeacherFromMatiereButton, TeacherActions, TeacherMatiereActions } from '@/components/AdminTeacherPage';
 import { Avatar } from '@heroui/avatar';
 import Link from 'next/link';
@@ -17,30 +17,14 @@ const Page = async ({ params }: PageProps) => {
 	const idTeacherNumber = parseInt(idTeacher);
 
 	// Récupérer les informations de l'enseignant
-	const teachersResponse = await getAllTeachers();
-	if (!('success' in teachersResponse) || !teachersResponse.success) {
+	const [teachersResponse, classesResponse, matieresResponse] = await Promise.all([getOneTeacher(idTeacherNumber), getAllClassesForOneTeacher(idTeacherNumber), getTeacherMatieres(idTeacherNumber)]);
+
+	if (!('success' in teachersResponse) || !('success' in classesResponse) || !('success' in matieresResponse)) {
 		throw new Error("Impossible de récupérer les informations de l'enseignant");
 	}
 
-	const teacher = teachersResponse.data.find((t) => t.idUser === idTeacherNumber);
-	if (!teacher) {
-		throw new Error('Enseignant introuvable');
-	}
-
-	// Récupérer les classes de l'enseignant
-	const classesResponse = await getAllClassesForOneTeacher(idTeacherNumber);
-	if (!('success' in classesResponse) || !classesResponse.success) {
-		throw new Error("Impossible de récupérer les classes de l'enseignant");
-	}
-
+	const teacher = teachersResponse.data;
 	const classes = classesResponse.data;
-
-	// Récupérer les matières de l'enseignant
-	const matieresResponse = await getTeacherMatieres(idTeacherNumber);
-	if (!('success' in matieresResponse) || !matieresResponse.success) {
-		throw new Error("Impossible de récupérer les matières de l'enseignant");
-	}
-
 	const matieres = matieresResponse.data;
 
 	// Récupérer les diplômes pour chaque classe
@@ -145,7 +129,12 @@ const Page = async ({ params }: PageProps) => {
 											<td className="py-4 px-4 text-sm text-gray-600">#{matiere.idMatiere}</td>
 											<td className="py-4 px-4 text-sm font-medium text-gray-900">{matiere.nom}</td>
 											<td className="py-4 px-4 text-right">
-												<RemoveTeacherFromMatiereButton idMatiere={matiere.idMatiere} idTeacher={idTeacherNumber} matiereName={matiere.nom} isLastMatiere={matieres.length === 1} />
+												<RemoveTeacherFromMatiereButton
+													idMatiere={matiere.idMatiere}
+													idTeacher={idTeacherNumber}
+													matiereName={matiere.nom}
+													isLastMatiere={matieres.length === 1}
+												/>
 											</td>
 										</tr>
 									))}

@@ -1,30 +1,30 @@
 import { getAllStudents } from '@/backend_requests/students/getAllStudents';
+import { getAllStudentsCount } from '@/backend_requests/students/getAllStudentsCount';
+import { Pagination } from '@/components/AdminPage/Pagination';
 import { SearchFilter } from '@/components/AdminPage/SearchFilter';
 import { CreateStudentButton, DeleteStudentButton } from '@/components/AdminStudentPage';
 import { Avatar } from '@heroui/avatar';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 interface PageProps {
-	searchParams: Promise<{ search?: string }>;
+	searchParams: Promise<{ search?: string; page?: string }>;
 }
 
 const Page = async ({ searchParams }: PageProps) => {
-	const { search } = await searchParams;
+	const { search, page } = await searchParams;
+	if (!page) {
+		redirect('/admin/students?page=1');
+	}
 
-	const studentsResponse = await getAllStudents();
-	if (!('success' in studentsResponse) || !studentsResponse.success) {
+	const [studentsResponse, studentsCountResponse] = await Promise.all([getAllStudents(Number.parseInt(page), search), getAllStudentsCount()]);
+	if (!('success' in studentsResponse) || !('success' in studentsCountResponse)) {
 		throw new Error('Impossible de récupérer les étudiants');
 	}
 
-	let students = studentsResponse.data;
-
-	// Filtrer les étudiants si un terme de recherche est présent
-	if (search) {
-		const searchLower = search.toLowerCase();
-		students = students.filter(
-			(student) => student.name.toLowerCase().includes(searchLower) || student.lastName.toLowerCase().includes(searchLower) || student.email.toLowerCase().includes(searchLower)
-		);
-	}
+	const allStudentsCount = studentsCountResponse.data;
+	const students = studentsResponse.data.data;
+	const meta = studentsResponse.data.meta;
 
 	return (
 		<div className="flex flex-col w-full gap-6 p-6">
@@ -35,7 +35,10 @@ const Page = async ({ searchParams }: PageProps) => {
 
 			<div className="bg-white rounded-lg border border-gray-200">
 				<div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-					<h2 className="text-xl font-bold text-gray-900">Liste des étudiants ({students.length})</h2>
+					<div className="flex items-center gap-4">
+						<h2 className="text-xl font-bold text-gray-900">Liste des étudiants (total {allStudentsCount})</h2>
+						<Pagination meta={meta} />
+					</div>
 					<SearchFilter placeholder="Rechercher un étudiant..." />
 				</div>
 				<div className="p-6">
@@ -78,6 +81,9 @@ const Page = async ({ searchParams }: PageProps) => {
 							</table>
 						</div>
 					)}
+				</div>
+				<div className="flex mb-6 w-full items-center justify-center">
+					<Pagination meta={meta} />
 				</div>
 			</div>
 		</div>

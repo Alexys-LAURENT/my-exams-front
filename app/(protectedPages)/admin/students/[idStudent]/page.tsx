@@ -1,7 +1,7 @@
 import { getStudentClasses } from '@/backend_requests/classes/getStudentClasses';
 import { getClassDegree } from '@/backend_requests/degrees/getClassDegree';
 import { getUserGeneralAverageInClass } from '@/backend_requests/stats/getUserGeneralAverageInClass';
-import { getAllStudents } from '@/backend_requests/students/getAllStudents';
+import { getOneStudent } from '@/backend_requests/students/getOneStudent';
 import { RemoveStudentFromClassButton, StudentActions } from '@/components/AdminStudentPage';
 import { Avatar } from '@heroui/avatar';
 import Link from 'next/link';
@@ -17,31 +17,21 @@ const Page = async ({ params }: PageProps) => {
 	const idStudentNumber = parseInt(idStudent);
 
 	// Récupérer les informations de l'étudiant
-	const studentsResponse = await getAllStudents();
-	if (!('success' in studentsResponse) || !studentsResponse.success) {
+	const [studentResponse, classesResponse] = await Promise.all([getOneStudent(idStudentNumber), getStudentClasses(idStudentNumber)]);
+
+	if (!('success' in studentResponse) || !('success' in classesResponse)) {
 		throw new Error("Impossible de récupérer les informations de l'étudiant");
 	}
 
-	const student = studentsResponse.data.find((s) => s.idUser === idStudentNumber);
-	if (!student) {
-		throw new Error('Étudiant introuvable');
-	}
-
-	// Récupérer les classes de l'étudiant
-	const classesResponse = await getStudentClasses(idStudentNumber);
-	if (!('success' in classesResponse) || !classesResponse.success) {
-		throw new Error("Impossible de récupérer les classes de l'étudiant");
-	}
-
+	const student = studentResponse.data;
 	const classes = classesResponse.data;
 
 	// Récupérer les diplômes et moyennes pour chaque classe
 	const classesWithDetails = await Promise.all(
 		classes.map(async (classe) => {
-			const degreeResponse = await getClassDegree(classe.idClass);
-			const averageResponse = await getUserGeneralAverageInClass(classe.idClass, idStudentNumber);
+			const [degreeResponse, averageResponse] = await Promise.all([getClassDegree(classe.idClass), getUserGeneralAverageInClass(classe.idClass, idStudentNumber)]);
 
-			if (!('success' in degreeResponse) || !degreeResponse.success) {
+			if (!('success' in degreeResponse)) {
 				throw new Error(`Impossible de récupérer le diplôme pour la classe ${classe.name}`);
 			}
 

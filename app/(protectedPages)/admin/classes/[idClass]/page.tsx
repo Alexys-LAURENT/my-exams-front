@@ -3,8 +3,10 @@ import { getClassDegree } from '@/backend_requests/degrees/getClassDegree';
 import { getClassGeneralAverage } from '@/backend_requests/stats/getClassGeneralAverage';
 import { getUserGeneralAverageInClass } from '@/backend_requests/stats/getUserGeneralAverageInClass';
 import { getStudentsOfClass } from '@/backend_requests/students/getStudentsOfClass';
+import { getTeachersOfClass } from '@/backend_requests/teachers/getTeachersOfClass';
 import { ClassActions } from '@/components/AdminClassPage/ClassActions';
 import { RemoveStudentButton } from '@/components/AdminClassPage/RemoveStudentButton';
+import { RemoveTeacherButton } from '@/components/AdminClassPage/RemoveTeacherButton';
 import { Avatar } from '@heroui/avatar';
 import Link from 'next/link';
 
@@ -19,28 +21,21 @@ const Page = async ({ params }: PageProps) => {
 	const idClassNumber = parseInt(idClass);
 
 	// Récupérer toutes les données côté serveur
-	const classResponse = await getOneClass(idClassNumber);
-	if (!('success' in classResponse) || !classResponse.success) {
+	const [classResponse, studentsResponse, teachersResponse, averageResponse, degreeResponse] = await Promise.all([
+		getOneClass(idClassNumber),
+		getStudentsOfClass(idClassNumber),
+		getTeachersOfClass(idClassNumber),
+		getClassGeneralAverage(idClassNumber),
+		getClassDegree(idClassNumber),
+	]);
+
+	if (!('success' in classResponse) || !('success' in studentsResponse) || !('success' in teachersResponse) || !('success' in averageResponse) || !('success' in degreeResponse)) {
 		throw new Error('Impossible de récupérer les informations de la classe');
-	}
-
-	const studentsResponse = await getStudentsOfClass(idClassNumber);
-	if (!('success' in studentsResponse) || !studentsResponse.success) {
-		throw new Error('Impossible de récupérer les étudiants de la classe');
-	}
-
-	const averageResponse = await getClassGeneralAverage(idClassNumber);
-	if (!('success' in averageResponse) || !averageResponse.success) {
-		throw new Error('Impossible de récupérer la moyenne générale de la classe');
-	}
-
-	const degreeResponse = await getClassDegree(idClassNumber);
-	if (!('success' in degreeResponse) || !degreeResponse.success) {
-		throw new Error('Impossible de récupérer le diplôme de la classe');
 	}
 
 	const classe = classResponse.data;
 	const students = studentsResponse.data;
+	const teachers = teachersResponse.data;
 	const average = averageResponse.data.average;
 	const degree = degreeResponse.data;
 
@@ -81,7 +76,7 @@ const Page = async ({ params }: PageProps) => {
 						<h1 className="text-3xl font-bold text-gray-900">{classe.name}</h1>
 						<p className="text-gray-600 mt-1">{degree.name}</p>
 					</div>
-					<ClassActions classe={classe} existingStudentIds={students.map((s) => s.idUser)} />
+					<ClassActions classe={classe} existingStudentIds={students.map((s) => s.idUser)} existingTeacherIds={teachers.map((t) => t.idUser)} />
 				</div>
 			</div>
 
@@ -114,6 +109,58 @@ const Page = async ({ params }: PageProps) => {
 					<h3 className="text-sm font-semibold text-gray-600 mb-3">Moyenne générale</h3>
 					<p className="text-4xl font-bold text-green-600">{average ? average.toFixed(2) : 'N/A'}</p>
 					<p className="text-sm text-gray-500 mt-1">sur 20</p>
+				</div>
+			</div>
+
+			{/* Liste des professeurs */}
+			<div className="bg-white rounded-lg border border-gray-200">
+				<div className="px-6 py-4 border-b border-gray-200">
+					<h2 className="text-xl font-bold text-gray-900">Professeurs de la classe ({teachers.length})</h2>
+				</div>
+				<div className="p-6">
+					{teachers.length === 0 ? (
+						<div className="text-center py-12">
+							<p className="text-gray-500">Aucun professeur assigné à cette classe</p>
+							<p className="text-sm text-gray-400 mt-2">Cliquez sur &quot;Ajouter un professeur&quot; pour commencer</p>
+						</div>
+					) : (
+						<div className="overflow-x-auto">
+							<table className="w-full">
+								<thead>
+									<tr className="border-b border-gray-200">
+										<th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Avatar</th>
+										<th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Nom</th>
+										<th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Prénom</th>
+										<th className="text-left py-3 px-4 text-sm font-semibold text-gray-600">Email</th>
+										<th className="text-right py-3 px-4 text-sm font-semibold text-gray-600">Actions</th>
+									</tr>
+								</thead>
+								<tbody>
+									{teachers.map((teacher) => (
+										<tr key={teacher.idUser} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+											<td className="py-4 px-4">
+												<Avatar src={teacher.avatarPath || undefined} name={teacher.name} size="sm" className="shrink-0" />
+											</td>
+											<td className="py-4 px-4 text-sm text-gray-900">
+												<Link href={`/admin/teachers/${teacher.idUser}`} className="hover:text-blue-600 transition-colors">
+													{teacher.lastName}
+												</Link>
+											</td>
+											<td className="py-4 px-4 text-sm text-gray-900">
+												<Link href={`/admin/teachers/${teacher.idUser}`} className="hover:text-blue-600 transition-colors">
+													{teacher.name}
+												</Link>
+											</td>
+											<td className="py-4 px-4 text-sm text-gray-600">{teacher.email}</td>
+											<td className="py-4 px-4 text-right">
+												<RemoveTeacherButton idClass={idClassNumber} idTeacher={teacher.idUser} teacherName={`${teacher.name} ${teacher.lastName}`} />
+											</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
+					)}
 				</div>
 			</div>
 

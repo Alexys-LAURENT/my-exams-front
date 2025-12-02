@@ -1,30 +1,30 @@
 import { getAllTeachers } from '@/backend_requests/teachers/getAllTeachers';
+import { getAllTeachersCount } from '@/backend_requests/teachers/getAllTeachersCount';
+import { Pagination } from '@/components/AdminPage/Pagination';
 import { SearchFilter } from '@/components/AdminPage/SearchFilter';
 import { CreateTeacherButton, DeleteTeacherButton } from '@/components/AdminTeacherPage';
 import { Avatar } from '@heroui/avatar';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 interface PageProps {
-	searchParams: Promise<{ search?: string }>;
+	searchParams: Promise<{ search?: string; page?: string }>;
 }
 
 const Page = async ({ searchParams }: PageProps) => {
-	const { search } = await searchParams;
+	const { search, page } = await searchParams;
+	if (!page) {
+		redirect('/admin/teachers?page=1');
+	}
 
-	const teachersResponse = await getAllTeachers();
-	if (!('success' in teachersResponse) || !teachersResponse.success) {
+	const [teachersResponse, teachersCountResponse] = await Promise.all([getAllTeachers(Number.parseInt(page), search), getAllTeachersCount()]);
+	if (!('success' in teachersResponse) || !('success' in teachersCountResponse)) {
 		throw new Error('Impossible de récupérer les enseignants');
 	}
 
-	let teachers = teachersResponse.data;
-
-	// Filtrer les enseignants si un terme de recherche est présent
-	if (search) {
-		const searchLower = search.toLowerCase();
-		teachers = teachers.filter(
-			(teacher) => teacher.name.toLowerCase().includes(searchLower) || teacher.lastName.toLowerCase().includes(searchLower) || teacher.email.toLowerCase().includes(searchLower)
-		);
-	}
+	const teachers = teachersResponse.data.data;
+	const allTeachersCount = teachersCountResponse.data;
+	const meta = teachersResponse.data.meta;
 
 	return (
 		<div className="flex flex-col w-full gap-6 p-6">
@@ -35,7 +35,10 @@ const Page = async ({ searchParams }: PageProps) => {
 
 			<div className="bg-white rounded-lg border border-gray-200">
 				<div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-					<h2 className="text-xl font-bold text-gray-900">Liste des enseignants ({teachers.length})</h2>
+					<div className="flex items-center gap-2">
+						<h2 className="text-xl font-bold text-gray-900">Liste des enseignants (total {allTeachersCount})</h2>
+						<Pagination meta={meta} />
+					</div>
 					<SearchFilter placeholder="Rechercher un enseignant..." />
 				</div>
 				<div className="p-6">
@@ -78,6 +81,9 @@ const Page = async ({ searchParams }: PageProps) => {
 							</table>
 						</div>
 					)}
+				</div>
+				<div className="flex mb-6 w-full items-center justify-center">
+					<Pagination meta={meta} />
 				</div>
 			</div>
 		</div>

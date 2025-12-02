@@ -15,6 +15,7 @@ export const SearchFilter = ({ placeholder = 'Rechercher...' }: { placeholder?: 
 			const params = new URLSearchParams(searchParams.toString());
 			if (searchValue) {
 				params.set('search', searchValue);
+				params.set('page', '1');
 			} else {
 				params.delete('search');
 			}
