@@ -1,4 +1,4 @@
-import NextAuth, { DefaultSession } from 'next-auth';
+import NextAuth, { CredentialsSignin, DefaultSession } from 'next-auth';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { JWT } from 'next-auth/jwt';
 import Credentials from 'next-auth/providers/credentials';
@@ -53,7 +53,19 @@ declare module 'next-auth/jwt' {
 	}
 }
 
+class NoAccountError extends CredentialsSignin {
+	code = 'no_account';
+}
+
+class InvalidCredentialsError extends CredentialsSignin {
+	code = 'invalid_credentials';
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
+	pages: {
+		signIn: '/login',
+		error: '/login',
+	},
 	providers: [
 		Credentials({
 			credentials: {
@@ -100,6 +112,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 				}
 
 				if (res.error) {
+					if (res.message?.includes('Aucun compte')) {
+						throw new NoAccountError();
+					} else if (res.message?.includes('Mot de passe incorrect')) {
+						throw new InvalidCredentialsError();
+					}
 					throw new Error(encodeURI(res.message || 'Une erreur est survenue'));
 				}
 

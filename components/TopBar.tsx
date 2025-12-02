@@ -64,6 +64,7 @@ const TopBar = ({ loggedUser }: { loggedUser: Session }) => {
 										</span>
 										<span className="text-sm text-gray-500">{loggedUser!.user.email}</span>
 									</div>
+									<Link href={`/profile/${loggedUser.user.idUser}`}>Voir mon profile</Link>
 									<div className="pt-2 border-t border-gray-200">
 										<SignOutButton />
 									</div>

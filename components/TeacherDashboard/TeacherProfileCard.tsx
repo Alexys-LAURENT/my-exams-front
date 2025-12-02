@@ -1,6 +1,8 @@
 import BannerImage from '@/public/banner.png';
 import { auth } from '@/utils/auth';
 import { Avatar } from '@heroui/avatar';
+import { Button } from '@heroui/button';
+import Link from 'next/link';
 
 const TeacherProfileCard = async () => {
 	const session = await auth();
@@ -25,6 +27,11 @@ const TeacherProfileCard = async () => {
 					<p className="text-white/90 text-sm">Professeur</p>
 				</div>
 			</div>
+			<Link href={`/profile/${session.user.idUser}`}>
+				<Button variant="bordered" className="rounded-lg border-white border-2 text-white hover:bg-white/20">
+					Voir le profil
+				</Button>
+			</Link>
 		</div>
 	);
 };

@@ -16,7 +16,7 @@ const Page = () => {
 	const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 	const callbackUrl = useSearchParams().get('callbackUrl') || '/';
 
-	const errorMessage = decodeURI(useSearchParams().get('error') || '');
+	const errorCode = decodeURI(useSearchParams().get('code') || '');
 	const successMessage = decodeURI(useSearchParams().get('success') || '');
 	const handlesubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -86,7 +86,8 @@ const Page = () => {
 								Mot de passe oublié ?
 							</a>
 						</div>
-						{errorMessage && <p className="text-red-500 text-center text-sm">{errorMessage}</p>}
+						{errorCode && errorCode === 'invalid_credentials' && <p className="text-red-500 text-center text-sm">Email ou mot de passe incorrect</p>}
+						{errorCode && errorCode === 'no_account' && <p className="text-red-500 text-center text-sm">Aucun compte trouvé avec cet email</p>}
 						{successMessage && <p className="text-green-500 text-center text-sm">{successMessage}</p>}
 						<Button
 							isLoading={loading}

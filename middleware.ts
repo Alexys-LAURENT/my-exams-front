@@ -19,12 +19,12 @@ export default auth((req) => {
 	}
 
 	// Redirect students to student dashboard if they try to access non-student routes but allow specific exam routes
-	if (loggedUser && loggedUser.user.accountType === 'student' && !currentPath.startsWith('/student')) {
+	if (loggedUser && loggedUser.user.accountType === 'student' && !currentPath.startsWith('/student') && !currentPath.startsWith('/profile')) {
 		return NextResponse.redirect(new URL('/student/classes', req.url));
 	}
 
 	// Redirect admin to admin dashboard if they try to access non-admin routes
-	if (loggedUser && loggedUser.user.accountType === 'admin' && !currentPath.startsWith('/admin')) {
+	if (loggedUser && loggedUser.user.accountType === 'admin' && !currentPath.startsWith('/admin') && !currentPath.startsWith('/profile')) {
 		// Allow access to student exam pages and grades summary
 		if (!/^\/student\/\d+\/\d+\/\d+$/.test(currentPath) && !/^\/student\/\d+\/\d+\/grades-summary$/.test(currentPath)) {
 			return NextResponse.redirect(new URL('/admin/dashboard', req.url));
@@ -32,7 +32,7 @@ export default auth((req) => {
 	}
 
 	// Allow teachers to access only teacher routes and specific student exam routes
-	if (loggedUser && loggedUser.user.accountType === 'teacher' && !currentPath.startsWith('/teacher')) {
+	if (loggedUser && loggedUser.user.accountType === 'teacher' && !currentPath.startsWith('/teacher') && !currentPath.startsWith('/profile')) {
 		if (!/^\/student\/\d+\/\d+\/\d+$/.test(currentPath) && !/^\/student\/\d+\/\d+\/grades-summary$/.test(currentPath)) {
 			return NextResponse.redirect(new URL('/teacher/dashboard', req.url));
 		}

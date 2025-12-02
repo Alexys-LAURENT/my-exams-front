@@ -67,11 +67,12 @@ const page = async ({ params }: { params: Promise<{ idClass: string }> }) => {
 							</p>
 						</div>
 					</div>
-					<Button variant="bordered" className="rounded-lg border-white border-2 text-white hover:bg-white/20">
-						Voir le profil
-					</Button>
-				</div>
-
+					<Link href={`/profile/${session!.user.idUser}`}>
+						<Button variant="bordered" className="rounded-lg border-white border-2 text-white hover:bg-white/20">
+							Voir le profil
+						</Button>
+					</Link>
+				</div>{' '}
 				{/* Grande carte Moyenne Générale à droite - prend 2 lignes */}
 				<Link
 					href={`/student/${idClass}/${idStudent}/grades-summary`}
@@ -89,7 +90,6 @@ const page = async ({ params }: { params: Promise<{ idClass: string }> }) => {
 						</div>
 					</div>
 				</Link>
-
 				{/* Trois petites cartes statistiques */}
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 					<Link href={`/student/${idClass}/exams?status=pending`} className="bg-white hover:bg-slate-50 rounded-xl p-4 ">
