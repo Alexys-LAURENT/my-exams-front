@@ -29,13 +29,15 @@ const ExamRecapPage = async ({ idStudent, idExam, idClass, loggedUser, examClass
 
 	const examData = recapRes.data;
 
-	// Si c'est un professeur, afficher la vue professeur avec possibilité de notation
-	if (session.user.accountType === 'teacher') {
+	// Si c'est un professeur ou un admin, afficher la vue professeur
+	if (session.user.accountType === 'teacher' || session.user.accountType === 'admin') {
 		if (!('questions' in examData)) {
 			// The API will always return questions for teacher view so this is just a safety check
 			throw new Error('Exam data is incomplete for teacher view');
 		}
-		return <TeacherExamRecap examData={examData} idStudent={idStudent} examClass={examClass} />;
+		// Les admins peuvent voir mais pas corriger
+		const canDoCorrection = session.user.accountType === 'teacher';
+		return <TeacherExamRecap examData={examData} idStudent={idStudent} examClass={examClass} canDoCorrection={canDoCorrection} />;
 	}
 
 	// Si c'est un étudiant

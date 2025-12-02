@@ -25,7 +25,8 @@ export default auth((req) => {
 
 	// Redirect admin to admin dashboard if they try to access non-admin routes
 	if (loggedUser && loggedUser.user.accountType === 'admin' && !currentPath.startsWith('/admin')) {
-		if (!/^\/student\/\d+\/\d+\/grades-summary$/.test(currentPath)) {
+		// Allow access to student exam pages and grades summary
+		if (!/^\/student\/\d+\/\d+\/\d+$/.test(currentPath) && !/^\/student\/\d+\/\d+\/grades-summary$/.test(currentPath)) {
 			return NextResponse.redirect(new URL('/admin/dashboard', req.url));
 		}
 	}

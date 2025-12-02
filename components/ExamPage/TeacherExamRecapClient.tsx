@@ -26,9 +26,10 @@ interface TeacherExamRecapClientProps {
 	examData: ExamRecap & { isExamTimeFinished: true };
 	student: { name: string; lastName: string };
 	examClass: ExamClass;
+	canDoCorrection?: boolean;
 }
 
-const TeacherExamRecapClient = ({ examData, student, examClass }: TeacherExamRecapClientProps) => {
+const TeacherExamRecapClient = ({ examData, student, examClass, canDoCorrection = true }: TeacherExamRecapClientProps) => {
 	const router = useRouter();
 
 	const isCorrected = examData.examGrade?.status === 'corrigé';
@@ -165,7 +166,7 @@ const TeacherExamRecapClient = ({ examData, student, examClass }: TeacherExamRec
 			<div className="flex flex-col gap-4">
 				{questions.map((question, index) => {
 					const evalForQ = evaluations.find((x) => x.idQuestion === question.idQuestion);
-					const needsCorrection = !isCorrected && !question.isQcm && (!!evalForQ ? evalForQ.idEvaluation === null || evalForQ.note === null : true);
+					const needsCorrection = canDoCorrection && !isCorrected && !question.isQcm && (!!evalForQ ? evalForQ.idEvaluation === null || evalForQ.note === null : true);
 					return (
 						<div key={question.idQuestion} className={`p-6 bg-white border rounded-lg ${needsCorrection && studentHasDoneExam ? 'border-red-500' : 'border-black/10'}`}>
 							{/* En-tête de la question */}
@@ -247,7 +248,7 @@ const TeacherExamRecapClient = ({ examData, student, examClass }: TeacherExamRec
 									)}
 
 									{/* Section de notation pour les questions non-QCM */}
-									{!isCorrected && studentHasDoneExam && (
+									{canDoCorrection && !isCorrected && studentHasDoneExam && (
 										<div className="p-4 mt-4 border-2 border-blue-200 rounded-lg bg-blue-50">
 											<p className="mb-3 text-sm font-semibold text-blue-900">Notation</p>
 											<div className="flex flex-col gap-3">
@@ -313,7 +314,7 @@ const TeacherExamRecapClient = ({ examData, student, examClass }: TeacherExamRec
 			</div>
 
 			{/* Bouton d'envoi de la note globale (bleu, positionné en bas à droite) */}
-			{!isCorrected && studentHasDoneExam && (
+			{canDoCorrection && !isCorrected && studentHasDoneExam && (
 				<div className="fixed z-40 flex items-center self-center gap-3 p-3 bg-white border rounded-md shadow-md md:self-auto border-black/10 bottom-4 md:right-6">
 					<div className="px-3 py-2 text-sm font-medium text-gray-800 border rounded-md border-black/10 bg-gray-50">
 						Total: <span className="font-semibold">{totalNote.toFixed(2)}</span> / 20

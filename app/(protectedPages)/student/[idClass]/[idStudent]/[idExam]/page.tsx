@@ -22,9 +22,13 @@ function validateStudentAccess(session: Session | null, idStudent: number) {
 		redirect('/login');
 	}
 
+	// Les étudiants ne peuvent voir que leur propre page
 	if (session.user.accountType === 'student' && session.user.idUser !== idStudent) {
 		redirect('/');
 	}
+
+	// Les admins et les professeurs peuvent voir n'importe quelle page étudiant
+	// Pas de redirection nécessaire pour eux
 }
 
 // Vérification des dates de l'examen
@@ -84,8 +88,8 @@ const Page = async ({ params }: PageProps) => {
 	const { data: examClass } = examClassRelation;
 	const { user } = session!;
 
-	// Cas 1: Vue enseignant
-	if (user.accountType === 'teacher') {
+	// Cas 1: Vue enseignant ou admin
+	if (user.accountType === 'teacher' || user.accountType === 'admin') {
 		return <ExamRecapPage idClass={idClass} idStudent={idStudent} idExam={idExam} loggedUser={user} examClass={examClass} />;
 	}
 
