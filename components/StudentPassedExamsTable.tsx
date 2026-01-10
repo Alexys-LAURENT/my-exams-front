@@ -73,7 +73,8 @@ const StudentPassedExamsTable = ({ exams, idClass, idStudent }: StudentExamGrade
 						);
 					}
 					const note = exam.examGradeInfo.note;
-					let color: 'success' | 'warning' | 'danger' = 'success';
+					let color: 'success' | 'warning' | 'danger' | 'default' = 'success';
+					if ((note as unknown) === '-') color = 'default';
 					if (note < 10) color = 'danger';
 					else if (note < 14) color = 'warning';
 					return (
